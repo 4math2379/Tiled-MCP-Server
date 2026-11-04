@@ -8,7 +8,8 @@ welcome.
 ```bash
 npm install
 npm run build          # compile tiled-mcp/src to tiled-mcp/dist
-npm run smoke          # 39 offline end-to-end checks; must stay green
+npm run smoke          # 38 offline end-to-end checks; must stay green
+npm run smoke:http     # hosted mode checks; must stay green
 npm run docs           # regenerate docs/tools.md and docs/themes.md after changing tools or themes
 npm run inspect        # try tools by hand in the MCP Inspector
 npm run preview -- maps/<file>.tmj   # look at a map without Tiled
@@ -39,7 +40,7 @@ See [docs/themes.md](docs/themes.md#adding-a-theme).
 ## Pull requests
 
 1. One topic per pull request.
-2. `npm run build && npm run smoke` passes, and `npm run docs` shows no unexpected diff.
+2. `npm run build && npm run smoke && npm run smoke:http` passes, and `npm run docs` shows no unexpected diff.
 3. Update the README or `docs/` when behaviour changes, and add a line to `CHANGELOG.md`.
 
 By contributing you agree that your contribution is licensed under the [MIT license](LICENSE).

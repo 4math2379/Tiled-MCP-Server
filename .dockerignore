@@ -1,0 +1,8 @@
+.git
+node_modules
+tiled-mcp/node_modules
+tiled-mcp/dist
+**/.env
+**/.env.local
+*.log
+maps/*.png

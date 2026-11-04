@@ -1,7 +1,9 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { extname } from "node:path";
+import { basename, extname } from "node:path";
 import { getMap, objectCoordMode, serializeMap } from "../builder.js";
+import { isHosted } from "../context.js";
+import { publishMap } from "../downloads.js";
 import { mapsRoot, resolveUserPath } from "../paths.js";
 import { saveMapFile } from "../tmj.js";
 import { asText } from "./util.js";
@@ -71,6 +73,33 @@ export function registerExportTools(server: McpServer): void {
     },
     async ({ mapId }) => asText(serializeMap(mapId)),
   );
+
+  if (isHosted()) {
+    // The hosted server never writes to its own disk: the caller gets a download link instead.
+    server.registerTool(
+      "save_to_disk",
+      {
+        title: "Save (download link)",
+        description:
+          "Hosted server: packs the map into a .zip holding the .tmj file and the sprites it uses (including sprites generated in this session), laid out to open directly in Tiled, and returns a download link plus a link to the bare .tmj. Links expire after one hour. Only the file name of path is used; folders are ignored.",
+        inputSchema: {
+          mapId: z.string(),
+          path: z.string().min(1).describe("File name ending in .tmj or .json, e.g. 'crypt-chapel.tmj'"),
+        },
+        annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      },
+      async ({ mapId, path }) => {
+        const name = basename(path.replace(/\\/g, "/"));
+        const ext = extname(name).toLowerCase();
+        if (ext !== ".tmj" && ext !== ".json") {
+          throw new Error(`The file name must end in .tmj or .json (got '${path}').`);
+        }
+        getMap(mapId);
+        return asText({ ok: true, ...publishMap(mapId, name) });
+      },
+    );
+    return;
+  }
 
   server.registerTool(
     "save_to_disk",

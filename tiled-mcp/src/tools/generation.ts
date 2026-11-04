@@ -1,11 +1,12 @@
 // Optional, paid sprite generation with FLUX.1-dev through Hugging Face Inference Providers.
 // Everything else in this server is free and offline. sharp and @huggingface/inference are
 // loaded lazily so the map tools keep working even if those packages fail to install.
+// In hosted mode the call is billed to the caller's own token and the sprite stays in their
+// session (src/sprites.ts) instead of the server's disk.
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { existsSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildPrompt, NEGATIVE_PROMPT, type ThemeKey } from "../themes/prompts.js";
 import { THEME_KEYS, themeAssetDir } from "../themes/index.js";
@@ -13,19 +14,10 @@ import { THEME_ROLES } from "../types.js";
 import { getMap, overrideTileImage } from "../builder.js";
 import { assetsRoot, resolveUserPath } from "../paths.js";
 import { ASSET_PREFIX } from "../tmj.js";
+import { currentScope, isHosted } from "../context.js";
+import { loadSharp, type Sharp } from "../sharp.js";
+import { saveSprite, spriteExists } from "../sprites.js";
 import { asText } from "./util.js";
-
-type Sharp = (typeof import("sharp"))["default"];
-
-async function loadSharp(): Promise<Sharp> {
-  try {
-    return (await import("sharp")).default;
-  } catch (err) {
-    throw new Error(
-      `The 'sharp' image library could not be loaded (${err instanceof Error ? err.message : String(err)}). Run 'npm install' in the repository; sprite generation needs it, map editing does not.`,
-    );
-  }
-}
 
 /**
  * Magenta chroma key. FLUX is asked for a pure #FF00FF background, a colour no gothic sprite
@@ -90,7 +82,9 @@ async function resizeForTile(sharp: Sharp, buf: Buffer, geometry: "surface" | "c
     .toBuffer();
 }
 
+/** The token paid calls use. Hosted mode only ever uses the caller's own token. */
 function hfToken(): string | null {
+  if (isHosted()) return currentScope().hfToken ?? null;
   return process.env.HUGGINGFACE_API_KEY || process.env.HF_TOKEN || null;
 }
 
@@ -98,11 +92,19 @@ function hfProvider(): string {
   return process.env.TILED_HF_PROVIDER || "replicate";
 }
 
-const MISSING_TOKEN = {
-  ok: false,
-  error: "HUGGINGFACE_API_KEY (or HF_TOKEN) is not set. Sprite generation is a paid Hugging Face service; map editing does not need it.",
-  hint: "Add the token to tiled-mcp/.env or to the env block of your MCP client configuration. See docs/sprite-generation.md.",
-};
+function missingToken() {
+  return isHosted()
+    ? {
+        ok: false,
+        error: "No Hugging Face token was sent with this request. Sprite generation is a paid Hugging Face service billed to your own account; map editing does not need it.",
+        hint: "Configure your MCP client to send the header 'Authorization: Bearer hf_...' with a token that can make calls to Inference Providers. See docs/hugging-face.md.",
+      }
+    : {
+        ok: false,
+        error: "HUGGINGFACE_API_KEY (or HF_TOKEN) is not set. Sprite generation is a paid Hugging Face service; map editing does not need it.",
+        hint: "Add the token to tiled-mcp/.env or to the env block of your MCP client configuration. See docs/sprite-generation.md.",
+      };
+}
 
 /** Generate one sprite PNG and return the processed bytes. */
 async function renderSprite(prompt: ReturnType<typeof buildPrompt>, seed?: number) {
@@ -135,7 +137,9 @@ export function registerGenerationTools(server: McpServer): void {
     {
       title: "Generate one tile sprite (paid)",
       description:
-        "PAID: generates one isometric sprite for (theme, role) with FLUX.1-dev via Hugging Face Inference Providers, removes the magenta background and resizes it to 64x32 (floors) or 64x64 (walls, props). Saves <assets>/<theme>/<role>.png, or <role>__<variant>.png when variant is set. Takes 20-40 s and costs money per call; check that the file is missing first (list_themes shows missing sprites) and preview the prompt with preview_sprite_prompt. An existing file is kept unless force is true.",
+        isHosted()
+          ? "PAID, billed to the Hugging Face token you send: generates one isometric sprite for (theme, role) with FLUX.1-dev via Hugging Face Inference Providers, removes the magenta background and resizes it to 64x32 (floors) or 64x64 (walls, props). The sprite is returned as an image and kept with your session as <theme>/<role>.png, or <role>__<variant>.png when variant is set; maps of this session use it in previews and save_to_disk downloads. Takes 20-40 s and costs money per call; preview the prompt with preview_sprite_prompt first. Every theme already ships its sprites, so an existing one is kept unless force is true."
+          : "PAID: generates one isometric sprite for (theme, role) with FLUX.1-dev via Hugging Face Inference Providers, removes the magenta background and resizes it to 64x32 (floors) or 64x64 (walls, props). Saves <assets>/<theme>/<role>.png, or <role>__<variant>.png when variant is set. Takes 20-40 s and costs money per call; check that the file is missing first (list_themes shows missing sprites) and preview the prompt with preview_sprite_prompt. An existing file is kept unless force is true.",
       inputSchema: {
         theme: THEME,
         role: ROLE,
@@ -157,7 +161,14 @@ export function registerGenerationTools(server: McpServer): void {
       annotations: PAID,
     },
     async ({ theme, role, variant, material, lighting, extraDetail, seed, force, outputDir }) => {
-      if (!hfToken()) return asText(MISSING_TOKEN);
+      if (!hfToken()) return asText(missingToken());
+      const hosted = isHosted();
+      if (hosted && outputDir) {
+        return asText({
+          ok: false,
+          error: "outputDir is not available on the hosted server: generated sprites stay with your session and are included in the map download (save_to_disk).",
+        });
+      }
       const key = theme as ThemeKey;
       let rendered;
       try {
@@ -166,10 +177,11 @@ export function registerGenerationTools(server: McpServer): void {
         return asText({ ok: false, error: err instanceof Error ? err.message : String(err) });
       }
 
-      const dir = outputDir ? resolveUserPath(outputDir, assetsRoot()) : join(assetsRoot(), themeAssetDir(key));
       const fileName = variant ? `${role}__${variant}.png` : `${role}.png`;
-      const outPath = join(dir, fileName);
-      if (existsSync(outPath) && !force) {
+      const relPath = `${themeAssetDir(key)}/${fileName}`;
+      const dir = outputDir ? resolveUserPath(outputDir, assetsRoot()) : join(assetsRoot(), themeAssetDir(key));
+      const outPath = hosted ? relPath : join(dir, fileName);
+      if ((hosted ? spriteExists(relPath) : existsSync(outPath)) && !force) {
         return asText({
           ok: false,
           skipped: true,
@@ -181,21 +193,24 @@ export function registerGenerationTools(server: McpServer): void {
       const start = Date.now();
       try {
         const buf = await renderSprite(rendered, seed);
-        await mkdir(dir, { recursive: true });
-        await writeFile(outPath, buf);
-        return asText({
+        const saved = await saveSprite(relPath, buf, outPath);
+        const result = asText({
           ok: true,
           theme,
           role,
           variant: variant ?? null,
           geometry: rendered.geometry,
-          outputPath: outPath,
+          outputPath: saved,
           finalSize: rendered.geometry === "surface" ? "64x32" : "64x64",
-          relativePath: `${ASSET_PREFIX}${themeAssetDir(key)}/${fileName}`,
+          relativePath: `${ASSET_PREFIX}${relPath}`,
           bytes: buf.length,
           durationMs: Date.now() - start,
           promptUsed: rendered.prompt,
         });
+        // Hosted callers cannot read the server's disk: send them the image itself as well.
+        return hosted
+          ? { content: [...result.content, { type: "image" as const, data: buf.toString("base64"), mimeType: "image/png" }] }
+          : result;
       } catch (err) {
         return asText({ ok: false, error: err instanceof Error ? err.message : String(err), promptAttempted: rendered.prompt });
       }
@@ -229,7 +244,8 @@ export function registerGenerationTools(server: McpServer): void {
       const file = `${themeAssetDir(state.theme.key)}/${role}__${variant}.png`;
       const path = customPath ?? `${ASSET_PREFIX}${file}`;
       overrideTileImage(mapId, role, path, imageWidth, imageHeight);
-      const fileExists = customPath ? undefined : existsSync(join(assetsRoot(), file));
+      const fileExists = customPath ? undefined : spriteExists(file);
+      const where = isHosted() ? file : join(assetsRoot(), file);
       return asText({
         ok: true,
         mapId,
@@ -237,7 +253,7 @@ export function registerGenerationTools(server: McpServer): void {
         variant,
         imagePath: path,
         ...(fileExists === false
-          ? { warning: `No file at ${join(assetsRoot(), file)} yet: generate it with generate_tile_sprite (variant '${variant}') or Tiled will show a placeholder.` }
+          ? { warning: `No file at ${where} yet: generate it with generate_tile_sprite (variant '${variant}') or Tiled will show a placeholder.` }
           : {}),
       });
     },
@@ -281,28 +297,28 @@ export function registerGenerationTools(server: McpServer): void {
       annotations: PAID,
     },
     async ({ theme, force, seed }) => {
-      if (!hfToken()) return asText(MISSING_TOKEN);
+      if (!hfToken()) return asText(missingToken());
       const key = theme as ThemeKey;
-      const dir = join(assetsRoot(), themeAssetDir(key));
-      await mkdir(dir, { recursive: true });
+      const hosted = isHosted();
+      const dir = hosted ? themeAssetDir(key) : join(assetsRoot(), themeAssetDir(key));
 
       const results: Array<{ role: string; ok: boolean; path?: string; error?: string; durationMs?: number; skipped?: boolean }> = [];
       for (const role of THEME_ROLES) {
-        const outPath = join(dir, `${role}.png`);
+        const relPath = `${themeAssetDir(key)}/${role}.png`;
         let rendered;
         try {
           rendered = buildPrompt(key, role);
         } catch {
           continue; // no prompt for this role in this theme
         }
-        if (existsSync(outPath) && !force) {
-          results.push({ role, ok: true, path: outPath, skipped: true });
+        if (spriteExists(relPath) && !force) {
+          results.push({ role, ok: true, path: hosted ? relPath : join(assetsRoot(), relPath), skipped: true });
           continue;
         }
         const start = Date.now();
         try {
-          await writeFile(outPath, await renderSprite(rendered, seed));
-          results.push({ role, ok: true, path: outPath, durationMs: Date.now() - start });
+          const path = await saveSprite(relPath, await renderSprite(rendered, seed));
+          results.push({ role, ok: true, path, durationMs: Date.now() - start });
         } catch (err) {
           results.push({ role, ok: false, error: err instanceof Error ? err.message : String(err), durationMs: Date.now() - start });
         }

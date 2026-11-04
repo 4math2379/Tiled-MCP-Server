@@ -1,8 +1,10 @@
 // In-memory Tiled map builder. Each MapId is one map being composed during this server
 // session. Maps are not persisted between restarts: call save_to_disk or export_json.
 // The builder owns the tileset GIDs, the three tile layers and the two object groups.
+// Maps live in the caller's workspace (src/context.ts): one per MCP session in hosted mode.
 
 import { randomUUID } from "node:crypto";
+import { currentScope, isHosted } from "./context.js";
 import type {
   Theme,
   ThemeRole,
@@ -27,7 +29,7 @@ export interface Occupant {
   type: string;
 }
 
-interface BuilderState {
+export interface BuilderState {
   id: MapId;
   name: string;
   width: number;
@@ -50,7 +52,13 @@ interface BuilderState {
   createdAt: number;
 }
 
-const MAPS = new Map<MapId, BuilderState>();
+/** Maps of the current caller's workspace. */
+function maps(): Map<MapId, BuilderState> {
+  return currentScope().workspace.maps;
+}
+
+/** In hosted mode, how many maps one session may hold, so one caller cannot fill the shared memory. */
+export const MAX_HOSTED_MAPS = 20;
 
 const TILED_VERSION = "1.10.2";
 const FORMAT_VERSION = "1.10";
@@ -67,6 +75,11 @@ export function createMap(opts: CreateOptions): { mapId: MapId; summary: MapSumm
   if (opts.width < 1 || opts.width > MAX_MAP_SIZE || opts.height < 1 || opts.height > MAX_MAP_SIZE) {
     throw new Error(
       `Map size out of range: ${opts.width}x${opts.height} (allowed 1..${MAX_MAP_SIZE} per side).`,
+    );
+  }
+  if (isHosted() && maps().size >= MAX_HOSTED_MAPS) {
+    throw new Error(
+      `This session already holds ${MAX_HOSTED_MAPS} maps, the limit on the hosted server: discard_map the ones you no longer need.`,
     );
   }
 
@@ -160,7 +173,7 @@ export function createMap(opts: CreateOptions): { mapId: MapId; summary: MapSumm
     createdAt: Date.now(),
   };
 
-  MAPS.set(id, state);
+  maps().set(id, state);
   return { mapId: id, summary: summarize(state) };
 }
 
@@ -240,7 +253,7 @@ function summarize(state: BuilderState): MapSummary {
 }
 
 export function getMap(id: MapId): BuilderState {
-  const m = MAPS.get(id);
+  const m = maps().get(id);
   if (!m) {
     throw new Error(
       `Unknown mapId '${id}'. Call create_map first, or list_maps to see the maps of this session (maps are lost when the server restarts).`,
@@ -250,7 +263,7 @@ export function getMap(id: MapId): BuilderState {
 }
 
 export function listMaps(): MapSummary[] {
-  return Array.from(MAPS.values()).map((m) => summarize(m));
+  return Array.from(maps().values()).map((m) => summarize(m));
 }
 
 export function describeMap(id: MapId): MapSummary {
@@ -258,7 +271,7 @@ export function describeMap(id: MapId): MapSummary {
 }
 
 export function discardMap(id: MapId): boolean {
-  return MAPS.delete(id);
+  return maps().delete(id);
 }
 
 // ---------- Tile editing ----------

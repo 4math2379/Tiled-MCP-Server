@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tiled Map Builder</title>
+  <meta name="description" content="Describe a dungeon and an open AI model builds it as an isometric Tiled map you can preview and download.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28"><span>Tiled Map Builder</span></a>
+    <div id="account" class="account"></div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1>Describe a map. Get a Tiled file.</h1>
+      <p>
+        An open AI model reads your description and builds an isometric map with this project's
+        MCP tools: rooms, corridors, doors, traps, chests and spawns. Preview it here, then download
+        a .zip that opens in the <a href="https://www.mapeditor.org/" target="_blank" rel="noopener">Tiled editor</a>.
+      </p>
+      <p class="muted">
+        Everything runs on <strong>your</strong> Hugging Face account: the AI model calls are billed
+        to you (usually a few cents per map, often covered by your monthly inference credits). Your
+        token stays in this browser tab and is only used for your own requests.
+      </p>
+    </section>
+
+    <section id="signin" class="card" hidden>
+      <h2>Sign in</h2>
+      <p>Sign in so the AI model can run on your Hugging Face inference credits.</p>
+      <p><a id="login" class="button primary" href="/login" hidden>Sign in with Hugging Face</a></p>
+      <p id="iframe-note" class="muted" hidden>Sign-in opens the app in a new tab; carry on there.</p>
+      <details id="token-box">
+        <summary>Use an access token instead</summary>
+        <p class="muted">
+          Create one at <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">huggingface.co/settings/tokens</a>
+          with the permission "Make calls to Inference Providers". It is kept in this browser tab only.
+        </p>
+        <form id="token-form" class="row">
+          <input id="token-input" type="password" placeholder="hf_..." autocomplete="off" spellcheck="false" aria-label="Hugging Face access token">
+          <button class="button" type="submit">Use this token</button>
+        </form>
+        <p id="token-error" class="error" hidden></p>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>Describe your map</h2>
+      <form id="gen-form">
+        <label for="description">Description, in any language</label>
+        <textarea id="description" rows="5" maxlength="2000" required
+          placeholder="A crypt 28x18 under an abandoned chapel: two skeletons patrol the nave, a ghoul lord sleeps in the deep crypt behind a locked door, a poison trap guards the reliquary."></textarea>
+        <div class="examples" id="examples">
+          <span class="muted">Examples:</span>
+        </div>
+        <div class="grid">
+          <div>
+            <label for="theme">Theme</label>
+            <select id="theme"><option value="">Let the AI choose</option></select>
+          </div>
+          <div>
+            <label for="model">AI model</label>
+            <select id="model"></select>
+            <input id="model-custom" type="text" placeholder="owner/model, e.g. Qwen/Qwen3.8-27B" hidden aria-label="Custom model id">
+          </div>
+        </div>
+        <label class="check">
+          <input id="paid" type="checkbox">
+          <span>Allow up to 2 custom sprites made with FLUX for this map (extra cost per image, billed to you)</span>
+        </label>
+        <div class="actions">
+          <button id="run" class="button primary" type="submit">Build the map</button>
+          <button id="stop" class="button" type="button" hidden>Stop</button>
+        </div>
+        <p id="form-error" class="error" hidden></p>
+      </form>
+    </section>
+
+    <section id="progress" class="card" hidden>
+      <h2>Progress</h2>
+      <p id="status" class="status"></p>
+      <ol id="steps" class="steps"></ol>
+    </section>
+
+    <section id="result" class="card" hidden>
+      <h2 id="result-title">Your map</h2>
+      <div class="actions">
+        <a id="dl-zip" class="button primary" href="#">Download .zip (map + sprites)</a>
+        <a id="dl-tmj" class="button" href="#">Download .tmj only</a>
+      </div>
+      <p id="dl-note" class="muted"></p>
+      <img id="preview" class="preview" alt="Preview of the generated map">
+      <p class="muted legend">Markers: P player, E enemy, N NPC, D door, C chest, T trap, L lever, S stairs.</p>
+      <ul id="warnings" class="warnings"></ul>
+      <div id="report" class="report"></div>
+      <p id="usage" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2>Use it from your own AI agent</h2>
+      <p>
+        This app is also a remote MCP server with all 30 map tools. Connect Claude, Cursor or any MCP
+        client and send your own Hugging Face token. The map tools are free; sprite generation is
+        billed to that token. On this server, <code>save_to_disk</code> returns a download link.
+      </p>
+      <pre id="mcp-snippet" class="code"></pre>
+    </section>
+  </main>
+
+  <footer>
+    <a href="https://github.com/4math2379/Tiled-MCP-Server" target="_blank" rel="noopener">Source on GitHub</a>
+    <span>MIT license</span>
+    <span>v<span id="version"></span></span>
+  </footer>
+</body>
+</html>

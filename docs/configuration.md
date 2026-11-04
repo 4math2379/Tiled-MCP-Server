@@ -33,6 +33,29 @@ Relative paths in variables are resolved against the repository root.
 `NVIDIA_API_KEY` is **not** read by this server. It belongs to the agent that drives it, for
 example OpenCode running Nemotron (see [nemotron.md](nemotron.md)).
 
+## Hosted mode
+
+`npm run start:web` (`node tiled-mcp/dist/http.js`, the Docker image, the Hugging Face Space)
+serves the web page and the MCP tools over HTTP. See [hugging-face.md](hugging-face.md). In this
+mode paid calls only use the token each caller sends, so `HF_TOKEN` and `HUGGINGFACE_API_KEY`
+are ignored.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `7860` | HTTP port |
+| `HOST` | `127.0.0.1` (`0.0.0.0` in Docker) | Interface to listen on |
+| `PUBLIC_URL` | from `SPACE_HOST` or the request | Public base URL used in download links, e.g. `https://maps.example.com` |
+| `TILED_AGENT_MODEL` | `openai/gpt-oss-120b` | Default model of the web page's AI agent (any Inference Providers model with tool calling) |
+| `TILED_MAX_JOBS` | `4` | Web agent runs allowed at the same time; extra visitors get "busy, try again" |
+| `TILED_INFERENCE_URL` | `https://router.huggingface.co/v1` | OpenAI-compatible endpoint the agent calls; the HTTP smoke test points it at a local stand-in |
+
+A Hugging Face Space sets these itself; do not set them by hand:
+
+| Variable | Purpose |
+|---|---|
+| `SPACE_HOST` | The Space's public host name, used for links and the sign-in redirect |
+| `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OAUTH_SCOPES`, `OPENID_PROVIDER_URL` | "Sign in with Hugging Face", enabled by `hf_oauth: true` in the Space card |
+
 ## Paths on Windows and WSL
 
 Paths can use forward or back slashes. When the server runs on Linux, for example a client

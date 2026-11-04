@@ -21,6 +21,9 @@ Reply in the user's language. Map, room and creature names follow the user's lan
   restart the MCP client.
 - Clients without Agent Skills support can load this same workflow through the server's
   `map_builder` prompt.
+- No local install: the hosted server at `https://4math-tiled-map-builder.hf.space/mcp` has the
+  same tools (send `Authorization: Bearer <your Hugging Face token>`). There, `save_to_disk`
+  returns a download link instead of writing a file: give that link to the user.
 
 ## When to use
 

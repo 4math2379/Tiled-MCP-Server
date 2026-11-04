@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.3.0
+
+A hosted mode, published as a Hugging Face Space.
+
+### Added
+
+- Hosted mode (`npm run start:web`, `tiled-mcp/dist/http.js`), on one port:
+  - a web page where an open AI model on Hugging Face Inference Providers builds a map from a
+    description, with live progress, a PNG preview and a Tiled-ready `.zip`;
+  - every MCP tool over Streamable HTTP at `/mcp`, one isolated workspace per session;
+  - "Sign in with Hugging Face" when it runs on a Space.
+
+  Paid calls only ever use the caller's own token. See [docs/hugging-face.md](docs/hugging-face.md).
+- `Dockerfile` and the `huggingface/` folder (Space card and publishing script).
+- `npm run smoke:http`: offline end-to-end test of the hosted mode with a stand-in AI model.
+- Map previews draw grey placeholder tiles where a theme has no sprite yet.
+
+### Changed
+
+- The preview renderer moved to `tiled-mcp/src/render.ts`, shared by `npm run preview` and the
+  web page. `npm run preview` now needs `npm run build` first.
+- In hosted mode `save_to_disk` returns download links, and generated sprites stay in the
+  caller's session instead of the server's disk.
+
 ## 0.2.0
 
 Usable by anyone from a fresh clone, with English documentation.

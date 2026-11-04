@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://nodejs.org"><img alt="Node.js 20.9+" src="https://img.shields.io/badge/Node.js-%E2%89%A520.9-5FA04E?logo=nodedotjs&logoColor=white"></a>
   <a href="https://www.typescriptlang.org"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white"></a>
-  <a href="https://modelcontextprotocol.io"><img alt="Model Context Protocol" src="https://img.shields.io/badge/MCP-stdio%20server-8B5CF6?logo=modelcontextprotocol&logoColor=white"></a>
+  <a href="https://modelcontextprotocol.io"><img alt="Model Context Protocol" src="https://img.shields.io/badge/MCP-stdio%20%2B%20HTTP-8B5CF6?logo=modelcontextprotocol&logoColor=white"></a>
   <a href="https://www.mapeditor.org"><img alt="Tiled 1.10+" src="https://img.shields.io/badge/Tiled-.tmj%20maps-5DA9E9"></a>
   <a href="https://zod.dev"><img alt="Zod 4" src="https://img.shields.io/badge/Zod-4-3E67B1?logo=zod&logoColor=white"></a>
   <a href="docs/sprite-generation.md"><img alt="Hugging Face FLUX (optional)" src="https://img.shields.io/badge/Hugging%20Face-FLUX%20(optional)-FFD21E?logo=huggingface&logoColor=black"></a>
@@ -19,6 +19,11 @@
 </p>
 
 <p align="center">
+  <a href="https://huggingface.co/spaces/4math/tiled-map-builder"><img alt="Open in Hugging Face Spaces" src="https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-md.svg"></a>
+</p>
+
+<p align="center">
+  <a href="#-try-it-online">Try it online</a> ·
   <a href="#-quick-start">Quick start</a> ·
   <a href="docs/client-setup.md">Connect a client</a> ·
   <a href="docs/tools.md">Tool reference</a> ·
@@ -39,6 +44,24 @@
 - 🧠 **Agent skill and MCP prompt** (`map_builder`): a step-by-step workflow with an ASCII sketch confirmation, theme heuristics and tactical rules.
 - 🖌️ **Optional sprite generation** with FLUX.1-dev through Hugging Face. It is paid, opt-in, and never runs by accident.
 - 🔌 Works with **any MCP client**: Claude Code, Claude Desktop, Cursor, VS Code, Zed, OpenCode, and agents running NVIDIA Nemotron.
+- 🤗 **Hosted on Hugging Face**: a web page where an open AI model builds a map from your description, and a remote MCP endpoint. Paid calls always run on the visitor's own Hugging Face account.
+
+## 🤗 Try it online
+
+No install: open the **[Tiled Map Builder Space](https://huggingface.co/spaces/4math/tiled-map-builder)**,
+sign in with Hugging Face, describe a map in any language and download a `.zip` that opens in
+Tiled. The AI model (default `openai/gpt-oss-120b`) runs on **your** Hugging Face inference
+credits, usually a few cents per map; the Space owner pays nothing for your use and never sees
+your token.
+
+AI agents can use the same Space as a remote MCP server with their own token:
+
+```bash
+claude mcp add --transport http tiled-map-builder https://4math-tiled-map-builder.hf.space/mcp \
+  --header "Authorization: Bearer hf_YOUR_TOKEN"
+```
+
+How it works, costs, other clients, and running your own copy: **[docs/hugging-face.md](docs/hugging-face.md)**.
 
 ## 🖼️ Preview
 
@@ -58,12 +81,14 @@
 
 | | Technology | Role in this project |
 |---|---|---|
-| <img src="https://cdn.simpleicons.org/modelcontextprotocol/8B5CF6" width="22" alt=""> | [Model Context Protocol](https://modelcontextprotocol.io) | How agents discover and call the map tools (stdio transport) |
+| <img src="https://cdn.simpleicons.org/modelcontextprotocol/8B5CF6" width="22" alt=""> | [Model Context Protocol](https://modelcontextprotocol.io) | How agents discover and call the map tools (stdio locally, Streamable HTTP when hosted) |
 | <img src="https://cdn.simpleicons.org/typescript/3178C6" width="22" alt=""> | [TypeScript](https://www.typescriptlang.org) | Server source in `tiled-mcp/src` |
 | <img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" width="22" alt=""> | [Node.js](https://nodejs.org) 20.9+ | Runtime for the server and the scripts |
 | <img src="https://cdn.simpleicons.org/zod/3E67B1" width="22" alt=""> | [Zod](https://zod.dev) | Validates every tool input and generates the JSON schemas agents see |
 | 🗺️ | [Tiled](https://www.mapeditor.org) | Map editor that opens the generated `.tmj` files |
-| <img src="https://cdn.simpleicons.org/huggingface/FFD21E" width="22" alt=""> | [Hugging Face Inference](https://huggingface.co/docs/inference-providers) + FLUX.1-dev | Optional, paid tile sprite generation |
+| <img src="https://cdn.simpleicons.org/huggingface/FFD21E" width="22" alt=""> | [Hugging Face Inference Providers](https://huggingface.co/docs/inference-providers) | The hosted page's AI model (open LLMs with tool calling) and optional FLUX.1-dev sprites, billed to each user |
+| <img src="https://cdn.simpleicons.org/huggingface/FFD21E" width="22" alt=""> | [Hugging Face Spaces](https://huggingface.co/docs/hub/spaces) | Hosts the web page and remote MCP endpoint (Docker Space with "Sign in with Hugging Face") |
+| <img src="https://cdn.simpleicons.org/docker/2496ED" width="22" alt=""> | [Docker](https://www.docker.com) | Image of the hosted mode, used by the Space and for self-hosting |
 | 🖼️ | [sharp](https://sharp.pixelplumbing.com) | Background removal and resizing of generated sprites, PNG previews |
 | <img src="https://cdn.simpleicons.org/nvidia/76B900" width="22" alt=""> | [NVIDIA Nemotron](https://build.nvidia.com) | One of the agent models this server was designed and tested with |
 
@@ -76,7 +101,7 @@ git clone https://github.com/4math2379/Tiled-MCP-Server.git
 cd Tiled-MCP-Server
 npm install        # installs the server workspace
 npm run build      # compiles tiled-mcp/src to tiled-mcp/dist
-npm run smoke      # optional: 39 offline end-to-end checks
+npm run smoke      # optional: 38 offline end-to-end checks
 ```
 
 Then register the server with your MCP client. With **Claude Code**, from the repository folder:
@@ -204,7 +229,7 @@ Nothing is required for map building. Optional settings go in `tiled-mcp/.env` (
 | `TILED_OBJECT_COORDS` | `tiled` | `screen` restores the legacy object encoding for older importers |
 | `HUGGINGFACE_API_KEY` or `HF_TOKEN` | none | Only for paid sprite generation |
 
-All variables, the `.env` lookup order and security notes: **[docs/configuration.md](docs/configuration.md)**.
+All variables, the hosted-mode settings, the `.env` lookup order and security notes: **[docs/configuration.md](docs/configuration.md)**.
 
 ## 💸 Sprite generation (optional, paid)
 
@@ -227,6 +252,10 @@ The server works with any model that supports tool calling. It was built alongsi
 tiled-mcp/          MCP server (TypeScript): src/, package.json, tsconfig.json, .env.example
   src/tools/        tool groups: lifecycle, paint, procedural, layout-presets, objects, export, generation
   src/themes/       20 theme definitions and the FLUX prompt catalog
+  src/http.ts       hosted mode: web page, web AI agent, MCP over HTTP, Hugging Face sign-in
+  web/              the hosted web page (HTML, CSS, JS)
+huggingface/        Space card and the script that publishes this repository to the Space
+Dockerfile          image of the hosted mode (used by the Space)
 skills/map-builder/ agent skill, also served as the map_builder MCP prompt
 maps/               sample .tmj maps (default output folder of save_to_disk)
 assets/             isometric sprites per theme: <theme>/<role>.png
@@ -239,7 +268,9 @@ docs/               documentation, banner and preview images
 | Command | What it does |
 |---|---|
 | `npm run build` | Compile the server |
-| `npm run smoke` | Start the server and run 39 offline end-to-end checks |
+| `npm run smoke` | Start the server and run 38 offline end-to-end checks |
+| `npm run start:web` | Start the hosted mode (web page and MCP over HTTP) on port 7860 |
+| `npm run smoke:http` | Test the hosted mode offline, with a stand-in for the AI model |
 | `npm run inspect` | Open the server in the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) |
 | `npm run preview -- <map.tmj>` | Render a map to PNG without Tiled |
 | `npm run examples` | Rebuild the three scripted sample maps in `maps/` |

@@ -15,6 +15,11 @@ forward slashes (`C:/Users/me/Tiled-MCP-Server/...`) or doubled backslashes in J
 Optional settings go in an `env` block or in `tiled-mcp/.env`; see
 [configuration.md](configuration.md). Restart the client after changing its configuration.
 
+> **No install?** The same tools run as a remote MCP server on Hugging Face. Give your client
+> the URL `https://4math-tiled-map-builder.hf.space/mcp` and the header
+> `Authorization: Bearer hf_YOUR_TOKEN` instead of a command; see
+> [hugging-face.md](hugging-face.md#connect-an-ai-agent-to-the-mcp-endpoint).
+
 ## Claude Code
 
 From the repository folder:
