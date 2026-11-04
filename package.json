@@ -1,0 +1,26 @@
+{
+  "name": "tiled-mcp-server",
+  "version": "0.2.0",
+  "description": "Tiled Map Builder MCP: an MCP server that lets AI agents compose isometric Tiled maps, with sample maps, sprites, an agent skill and docs.",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4math2379/Tiled-MCP-Server.git"
+  },
+  "workspaces": [
+    "tiled-mcp"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace tiled-mcp",
+    "start": "npm run start --workspace tiled-mcp",
+    "inspect": "npx @modelcontextprotocol/inspector node tiled-mcp/dist/index.js",
+    "examples": "node scripts/create-aquatic-map.mjs && node scripts/create-glacier-map.mjs && node scripts/create-electronic-hacker-map.mjs",
+    "preview": "node scripts/render-map-preview.mjs",
+    "smoke": "node scripts/smoke-test.mjs",
+    "docs": "node scripts/gen-docs.mjs"
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}

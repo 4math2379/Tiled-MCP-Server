@@ -1,0 +1,48 @@
+{
+  "name": "tiled-map-builder-mcp",
+  "version": "0.2.0",
+  "description": "MCP server that composes isometric Tiled (.tmj) maps: themes, rooms, corridors, layout presets, objects, spawns, validation, export, and optional FLUX sprite generation.",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "tiled",
+    "tilemap",
+    "isometric",
+    "map-generator",
+    "procedural-generation",
+    "ttrpg",
+    "ai-agents"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4math2379/Tiled-MCP-Server.git",
+    "directory": "tiled-mcp"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "tiled-map-builder-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^4.13.15",
+    "@modelcontextprotocol/sdk": "^1.23.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}
