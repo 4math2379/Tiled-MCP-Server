@@ -234,7 +234,8 @@ function systemPrompt(skill: string, allowPaid: boolean): string {
       ? "- The person allowed paid sprite generation (billed to them). Use generate_tile_sprite only for at most 2 contextual variants that clearly fit the description, then bind them with override_tile_image."
       : "- Sprite generation is not available: use the sprites every theme already ships.",
     `- You have at most ${MAX_TOOL_CALLS} tool calls. Prefer layout presets, generate_room and generate_corridor over painting cells one by one.`,
-    "- When the map is valid, reply with a short report in the person's language: name, theme, size, layout, spawns, objects, validation result. Leave out the mapId and file paths.",
+    "- Write the map name, creature names and your final report in the language of the map request. Theme display names are often French: do not let them change your language.",
+    "- When the map is valid, reply with a short report: name, theme, size, layout, spawns, objects, validation result. Leave out the mapId and file paths.",
     "",
     "Skill:",
     "",
