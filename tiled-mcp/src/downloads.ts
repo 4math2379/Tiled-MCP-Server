@@ -4,10 +4,14 @@
 
 import { randomBytes } from "node:crypto";
 import { zipSync } from "fflate";
-import { serializeMap, type MapId } from "./builder.js";
+import { getMap, serializeMap, type MapId } from "./builder.js";
 import { currentScope } from "./context.js";
+import { slugify } from "./names.js";
 import { readSprite } from "./sprites.js";
-import { ASSET_PREFIX } from "./tmj.js";
+import { ASSET_PREFIX, stringifyMap } from "./tmj.js";
+import type { TiledMap } from "./types.js";
+
+export { slugify };
 
 const TTL_MS = 60 * 60 * 1000;
 const MAX_TOTAL_BYTES = 256 * 1024 * 1024;
@@ -56,16 +60,24 @@ function publish(name: string, contentType: string, data: Buffer): string {
   return `${currentScope().baseUrl ?? ""}/download/${id}/${encodeURIComponent(name)}`;
 }
 
-/** File-system friendly slug of a map name, e.g. "Crypt under the chapel" -> "crypt-under-the-chapel". */
-export function slugify(name: string): string {
-  const slug = name
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-  return slug || "map";
+type ZipFiles = Record<string, [Uint8Array, { level: 0 | 6 }]>;
+
+/** Add the sprites a map uses below `<base>/assets/`; returns the ones that are missing. */
+function addSprites(files: ZipFiles, map: TiledMap, base: string): string[] {
+  const missing: string[] = [];
+  for (const tileset of map.tilesets) {
+    for (const tile of tileset.tiles ?? []) {
+      if (!tile.image?.startsWith(ASSET_PREFIX)) continue;
+      const rel = tile.image.slice(ASSET_PREFIX.length);
+      const key = `${base}/assets/${rel}`;
+      if (files[key]) continue;
+      const data = readSprite(rel);
+      // PNGs are already compressed: store them as is.
+      if (data) files[key] = [data, { level: 0 }];
+      else missing.push(rel);
+    }
+  }
+  return missing;
 }
 
 /**
@@ -74,20 +86,45 @@ export function slugify(name: string): string {
  */
 export function mapArchive(mapId: MapId, base: string): { zip: Buffer; tmj: Buffer; missingSprites: string[] } {
   const map = serializeMap(mapId);
-  const tmj = Buffer.from(`${JSON.stringify(map, null, 2)}\n`, "utf8");
-  const files: Record<string, [Uint8Array, { level: 0 | 6 }]> = { [`${base}/${base}.tmj`]: [tmj, { level: 6 }] };
-  const missingSprites: string[] = [];
-  for (const tileset of map.tilesets) {
-    for (const tile of tileset.tiles ?? []) {
-      if (!tile.image?.startsWith(ASSET_PREFIX)) continue;
-      const rel = tile.image.slice(ASSET_PREFIX.length);
-      const data = readSprite(rel);
-      // PNGs are already compressed: store them as is.
-      if (data) files[`${base}/assets/${rel}`] = [data, { level: 0 }];
-      else missingSprites.push(rel);
-    }
-  }
+  const tmj = Buffer.from(stringifyMap(map), "utf8");
+  const files: ZipFiles = { [`${base}/${base}.tmj`]: [tmj, { level: 6 }] };
+  const missingSprites = addSprites(files, map, base);
   return { zip: Buffer.from(zipSync(files)), tmj, missingSprites };
+}
+
+/**
+ * Pack linked maps side by side as `<base>/<fileName>` (the names their links use) with one
+ * shared `<base>/assets/` folder.
+ */
+export function worldArchive(mapIds: MapId[], base: string): { zip: Buffer; files: string[]; missingSprites: string[] } {
+  const files: ZipFiles = {};
+  const missing = new Set<string>();
+  const names: string[] = [];
+  for (const id of mapIds) {
+    const map = serializeMap(id);
+    const fileName = getMap(id).fileName;
+    files[`${base}/${fileName}`] = [Buffer.from(stringifyMap(map), "utf8"), { level: 6 }];
+    names.push(fileName);
+    for (const m of addSprites(files, map, base)) missing.add(m);
+  }
+  return { zip: Buffer.from(zipSync(files)), files: names, missingSprites: [...missing] };
+}
+
+/** Publish one map's bare .tmj (its links point at sibling files the world .zip holds). */
+export function publishTmj(mapId: MapId, fileName: string): string {
+  return publish(fileName, "application/json", Buffer.from(stringifyMap(serializeMap(mapId)), "utf8"));
+}
+
+/** Publish linked maps as one .zip; returns its link. */
+export function publishWorld(mapIds: MapId[], name: string) {
+  const base = slugify(name);
+  const { zip, files, missingSprites } = worldArchive(mapIds, base);
+  return {
+    zipUrl: publish(`${base}.zip`, "application/zip", zip),
+    files,
+    expiresAt: new Date(Date.now() + TTL_MS).toISOString(),
+    ...(missingSprites.length ? { missingSprites } : {}),
+  };
 }
 
 /** Publish a map as a .zip (Tiled-ready, with sprites) and as a bare .tmj; returns both links. */

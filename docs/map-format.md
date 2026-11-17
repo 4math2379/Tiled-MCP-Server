@@ -10,10 +10,11 @@ engine or write an importer.
 |---|---|
 | `orientation` | `isometric` (default) or `orthogonal` |
 | `renderorder` | `right-down` |
-| `width`, `height` | 1 to 64 cells each (tools accept 4 to 64) |
+| `width`, `height` | 4 to 256 cells each (128 on the hosted server; `TILED_MAX_MAP_SIZE` changes the limit, see [configuration.md](configuration.md)) |
 | `tilewidth`, `tileheight` | 64 x 32 pixels for every bundled theme |
 | `infinite` | `false` |
-| map properties | `theme` (theme key), `mapName` (display name) |
+| map properties | `theme` (theme key), `mapName` (display name); interiors made by `place_building` add `buildingId` and `parentMap` (file) |
+| layer `data` | plain arrays (no encoding or compression), written on one line per layer |
 
 ## Coordinates
 
@@ -40,8 +41,12 @@ Every map has the same five layers, in this order:
 | 1 | `ground` | tile layer | floors, hazards, difficult terrain |
 | 2 | `walls` | tile layer | walls; a cell with a wall is impassable even though it also has a floor |
 | 3 | `decorations` | tile layer | props drawn above the ground; `OBSTACLE` props block movement |
-| 4 | `objects` | object group | doors, chests, traps, levers, zone stairs |
-| 5 | `spawns` | object group | player, enemy and NPC spawn points |
+| 4 | `objects` | object group | doors, chests, traps, levers, zone stairs, entrances and exits |
+| 5 | `spawns` | object group | player, enemy, NPC and arrival spawn points |
+
+A map with buildings has a sixth layer, `buildings` (id 6, object group), placed between
+`decorations` and `objects` so markers stay on top. See
+[Buildings and transitions](#buildings-and-transitions).
 
 ## Tilesets and tile properties
 
@@ -85,10 +90,13 @@ Objects live in the `objects` group. `type` repeats the kind.
 
 | Property | Type | Present on | Meaning |
 |---|---|---|---|
-| `kind` | string | all | `door`, `chest`, `trap`, `lever`, `stairs` |
+| `kind` | string | all | `door`, `chest`, `trap`, `lever`, `stairs`, `entrance`, `exit` |
 | `state` | string | all | `closed`, `open`, `locked` (`stairs` objects are `open`) |
 | `pickDC` | int | locked doors and chests | lock difficulty, 5 to 30 |
-| `targetZoneId` | string | doors, stairs | id of the zone it leads to |
+| `targetZoneId` | string | doors, stairs | id of the zone it leads to, defined by your engine |
+| `targetMap` | file | transitions: entrances, exits, linked doors and stairs | `.tmj` file of the map it leads to, relative to this map |
+| `targetSpawn` | string | transitions | name of the `arrival` spawn where the player lands in `targetMap` |
+| `buildingId` | string | entrances and exits | id of the building they belong to |
 | `trapType` | string | traps | damage type |
 | `trapNotation` | string | traps | damage dice, e.g. `2d6` |
 | `trapSaveDC` | int | traps | saving throw difficulty, 5 to 30 |
@@ -99,9 +107,55 @@ Spawns live in the `spawns` group. `type` repeats the role.
 
 | Property | Type | Meaning |
 |---|---|---|
-| `role` | string | `player`, `enemy` or `npc` |
+| `role` | string | `player`, `enemy`, `npc` or `arrival` |
 | `npcName` | string | display name (optional) |
 | `encounterId` | string | id of an encounter in your engine (optional, enemies) |
+
+An `arrival` spawn is where a player lands when coming through a transition; its `name` is what
+the transition's `targetSpawn` refers to. It sits next to the transition leading back, never on
+it, so arriving does not send the player straight back.
+
+## Buildings and transitions
+
+`place_building` and `link_maps` connect maps of one session; `save_world` writes them side by
+side under the file names the links use. A full guide, with a Godot loader, is in
+[worlds-and-buildings.md](worlds-and-buildings.md).
+
+### Building sprites
+
+Buildings are **tile objects** on the `buildings` layer, drawn from a second tileset named
+`buildings` (a collection of images, `firstgid` right after the theme tileset,
+`objectalignment: "bottom"`). Each tile carries `tileType: BUILDING` and `buildingType`.
+
+A building covers a square footprint of `n x n` cells starting at `(fx, fy)`. Its object is
+anchored at its bottom centre on the footprint's bottom corner, tile point `(fx + n, fy + n)`:
+
+| | Isometric (`tiled` coordinates) | Isometric (`screen`) | Orthogonal |
+|---|---|---|---|
+| `x` | `(fx + n) * th` | `tw/2 * ((fx + n) - (fy + n))` | `(fx + n/2) * tw` |
+| `y` | `(fy + n) * th` | `th/2 * ((fx + n) + (fy + n))` | `(fy + n) * th` |
+
+`width` and `height` are the image size: `n * 64` pixels wide (house and shop 192x192, tavern
+and temple 256x256, tower 128x192, castle 384x384). Building object properties:
+
+| Property | Type | Meaning |
+|---|---|---|
+| `kind` | string | `building` |
+| `buildingType` | string | `house`, `shop`, `tavern`, `temple`, `tower`, `castle` |
+| `buildingId` | string | id shared with its entrance, exit and arrival spawns |
+| `footprintX`, `footprintY`, `footprintSize` | int | the cells it covers; treat them as blocked except the entrance cell |
+| `interiorMap` | file | its interior `.tmj` (absent for buildings without one) |
+
+### Following a transition
+
+An object with a `targetMap` property is a transition. When the player steps on its cell:
+
+1. load the map named by `targetMap`, resolved relative to the current map's file;
+2. find the spawn whose `name` equals `targetSpawn` in that map's `spawns` layer;
+3. put the player on that spawn's cell.
+
+`targetMap` is a Tiled **file** property (`"type": "file"`): Tiled stores it relative to the map
+and opens the target when you right-click it in the Properties panel.
 
 ## Object coordinates
 
@@ -149,7 +203,11 @@ legacy positions on the right tiles, so prefer migrating the importer to the for
 `validate_map` returns:
 
 - **errors**: structural problems (missing fields, invalid size or orientation).
-- **warnings**: no player spawn, an object or spawn on a wall or outside the painted ground,
-  a door still inside a wall.
+- **warnings**: no player spawn (or arrival point), an object or spawn on a wall or outside
+  the painted ground, a door still inside a wall.
+
+`validate_world` checks the links between maps: every transition leads to a map of the session
+and to an arrival spawn that exists there (errors), every link has a way back, every map can be
+entered, and building sprites exist (warnings).
 
 Your engine should still validate the map on import.

@@ -1,6 +1,6 @@
 {
   "name": "tiled-mcp-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Tiled Map Builder MCP: an MCP server that lets AI agents compose isometric Tiled maps, with sample maps, sprites, an agent skill and docs.",
   "private": true,
   "license": "MIT",
@@ -16,7 +16,7 @@
     "start": "npm run start --workspace tiled-mcp",
     "start:web": "npm run start:web --workspace tiled-mcp",
     "inspect": "npx @modelcontextprotocol/inspector node tiled-mcp/dist/index.js",
-    "examples": "node scripts/create-aquatic-map.mjs && node scripts/create-glacier-map.mjs && node scripts/create-electronic-hacker-map.mjs",
+    "examples": "node scripts/create-aquatic-map.mjs && node scripts/create-glacier-map.mjs && node scripts/create-electronic-hacker-map.mjs && node scripts/create-village-world.mjs",
     "preview": "node scripts/render-map-preview.mjs",
     "smoke": "node scripts/smoke-test.mjs",
     "smoke:http": "node scripts/smoke-http.mjs",

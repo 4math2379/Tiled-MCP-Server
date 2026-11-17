@@ -5,7 +5,7 @@ import { getMap, objectCoordMode, serializeMap } from "../builder.js";
 import { isHosted } from "../context.js";
 import { publishMap } from "../downloads.js";
 import { mapsRoot, resolveUserPath } from "../paths.js";
-import { saveMapFile } from "../tmj.js";
+import { saveMapFile, stringifyMap } from "../tmj.js";
 import { asText } from "./util.js";
 
 /** Structural check of the Tiled JSON. The game engine that imports the map should re-validate. */
@@ -40,17 +40,20 @@ export function registerExportTools(server: McpServer): void {
       const errors = validateTiledShape(serializeMap(mapId));
       const warnings: string[] = [];
 
-      const hasPlayer = state.spawns.objects.some((o) =>
-        o.properties?.some((p) => p.name === "role" && p.value === "player"),
-      );
-      if (!hasPlayer) warnings.push("No 'player' spawn: the map is not playable until one is placed (place_spawn_player).");
+      const hasRole = (role: string) =>
+        state.spawns.objects.some((o) => o.properties?.some((p) => p.name === "role" && p.value === role));
+      // A map entered through a transition (an interior) starts the player on an arrival point.
+      if (!hasRole("player") && !hasRole("arrival")) {
+        warnings.push("No 'player' spawn: the map is not playable until one is placed (place_spawn_player).");
+      }
 
       for (const [key, who] of state.occupied) {
+        if (who.type === "building") continue; // footprint cells, checked by place_building
         const [x, y] = key.split(",").map(Number);
         const i = y * state.width + x;
         const onWall = state.walls.data[i] !== 0;
         const onGround = state.ground.data[i] !== 0;
-        if (who.type === "door") {
+        if (who.type === "door" || who.type === "exit") {
           if (onWall) warnings.push(`Door "${who.name}" at (${x}, ${y}) is still inside a wall: erase the wall tile (erase_tile layer=walls).`);
           continue;
         }
@@ -67,11 +70,11 @@ export function registerExportTools(server: McpServer): void {
     {
       title: "Export as Tiled JSON",
       description:
-        "Returns the full Tiled JSON (.tmj content) of a map as text. Sprite paths are written as './assets/<theme>/<role>.png' relative to the repository root; use save_to_disk to get a file whose sprite paths resolve from where it is saved.",
+        "Returns the full Tiled JSON (.tmj content) of a map as text, each tile layer's data on one line. Sprite paths are written as './assets/<theme>/<role>.png' relative to the repository root; use save_to_disk to get a file whose sprite paths resolve from where it is saved. Large maps make long answers: prefer save_to_disk or save_world above 64x64.",
       inputSchema: { mapId: z.string() },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ mapId }) => asText(serializeMap(mapId)),
+    async ({ mapId }) => ({ content: [{ type: "text" as const, text: stringifyMap(serializeMap(mapId)) }] }),
   );
 
   if (isHosted()) {
@@ -106,7 +109,7 @@ export function registerExportTools(server: McpServer): void {
     {
       title: "Save to disk",
       description:
-        "Writes the map to a .tmj file that opens directly in the Tiled editor. A relative path is resolved against the maps folder (the repository's maps/ by default, or TILED_MAPS_DIR); an absolute path is used as is. Missing folders are created and an existing file is overwritten. Sprite paths inside the file are rewritten relative to its location so Tiled finds the PNGs.",
+        "Writes the map to a .tmj file that opens directly in the Tiled editor. A relative path is resolved against the maps folder (the repository's maps/ by default, or TILED_MAPS_DIR); an absolute path is used as is. Missing folders are created and an existing file is overwritten. Sprite paths inside the file are rewritten relative to its location so Tiled finds the PNGs. For maps linked by place_building or link_maps, use save_world so the linked files land side by side under the names their links use.",
       inputSchema: {
         mapId: z.string(),
         path: z

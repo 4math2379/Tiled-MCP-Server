@@ -25,10 +25,11 @@ Relative paths in variables are resolved against the repository root.
 | `TILED_MAPS_DIR` | `<repo>/maps` | `save_to_disk` | Folder for relative output paths |
 | `TILED_ASSETS_DIR` | `<repo>/assets` | sprites, `list_themes`, `save_to_disk` | Sprite root holding `<theme_lowercase>/<role>.png` |
 | `TILED_OBJECT_COORDS` | `tiled` | object and spawn placement | `tiled` writes Tiled's native isometric object positions; `screen` writes the legacy screen-space encoding (see [map-format.md](map-format.md#object-coordinates)) |
+| `TILED_MAX_MAP_SIZE` | `256` (`128` in hosted mode) | `create_map`, `place_building` | Largest map side in cells, 16 to 1024. Large maps cost memory and longer previews, so keep the hosted value modest |
 | `TILED_SKILL_FILE` | `<repo>/skills/map-builder/SKILL.md` | `map_builder` prompt | Skill text served by the prompt |
 | `TILED_ENV_FILE` | `<repo>/tiled-mcp/.env` | startup | Alternative `.env` file to load |
 | `HUGGINGFACE_API_KEY` or `HF_TOKEN` | none | sprite generation | Hugging Face token. **Paid usage**, see [sprite-generation.md](sprite-generation.md) |
-| `TILED_HF_PROVIDER` | `replicate` | sprite generation | Hugging Face Inference Provider serving FLUX.1-dev |
+| `TILED_HF_PROVIDER` | `auto` | sprite generation | Hugging Face Inference Provider serving FLUX.1-dev. `auto` uses the first provider Hugging Face lists as live for the model (fal-ai in November 2026) |
 
 `NVIDIA_API_KEY` is **not** read by this server. It belongs to the agent that drives it, for
 example OpenCode running Nemotron (see [nemotron.md](nemotron.md)).

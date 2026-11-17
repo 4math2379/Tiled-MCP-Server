@@ -84,6 +84,80 @@ function applyLayout(mapId: string, rooms: RoomPlan[], corridors: CorridorPlan[]
   }
 }
 
+export type CastleVariant = "entrance" | "throne" | "private_chambers";
+
+/**
+ * Lays out a castle floor (see generate_castle_floor). The wall under the main entrance on the
+ * antechamber's west side is always opened; the locked main door object is placed only when
+ * `mainDoor` is true, so place_building can put its exit there instead. Returns the entrance
+ * cell and the antechamber cell just inside it.
+ */
+export function buildCastleFloor(
+  mapId: string,
+  variant: CastleVariant,
+  opts: { addPlayerSpawn: boolean; mainDoor: boolean },
+): { rooms: string[]; entrance: { x: number; y: number }; inside: { x: number; y: number } } {
+  assertMinSize(mapId, "castle", "generate_castle_floor");
+  const state = getMap(mapId);
+  const w = state.width;
+  const h = state.height;
+  const cy = Math.floor(h / 2);
+
+  const antechamber: RoomPlan = { label: "antechamber", originX: 0, originY: cy - 3, width: 6, height: 6, exits: [{ direction: "east" }] };
+  const greatHall: RoomPlan = {
+    label: "great-hall",
+    originX: 8,
+    originY: cy - 4,
+    width: 10,
+    height: 9,
+    exits: [{ direction: "west" }, { direction: "north" }, { direction: "south" }, { direction: "east" }],
+    obstacleCorners: variant === "throne",
+  };
+  const northWing: RoomPlan = { label: "north-wing", originX: 10, originY: 0, width: 7, height: 5, exits: [{ direction: "south" }] };
+  const southWing: RoomPlan = { label: "south-wing", originX: 10, originY: h - 5, width: 7, height: 5, exits: [{ direction: "north" }] };
+  const farRoom: RoomPlan = {
+    label: variant === "throne" ? "throne-room" : variant === "private_chambers" ? "private-chambers" : "inner-courtyard",
+    originX: Math.min(w - 8, 20),
+    originY: cy - 3,
+    width: 7,
+    height: 7,
+    exits: [{ direction: "west" }],
+    obstacleCorners: variant !== "entrance",
+  };
+
+  const corridors: CorridorPlan[] = [
+    { fromX: antechamber.originX + antechamber.width, fromY: cy, toX: greatHall.originX - 1, toY: cy },
+    { fromX: greatHall.originX + greatHall.width, fromY: cy, toX: farRoom.originX - 1, toY: cy },
+    { fromX: northWing.originX + 3, fromY: northWing.originY + northWing.height, toX: northWing.originX + 3, toY: greatHall.originY - 1 },
+    { fromX: southWing.originX + 3, fromY: greatHall.originY + greatHall.height, toX: southWing.originX + 3, toY: southWing.originY - 1 },
+  ];
+
+  const rooms = [antechamber, greatHall, northWing, southWing, farRoom];
+  applyLayout(mapId, rooms, corridors);
+
+  if (variant === "throne") {
+    const tx = farRoom.originX + Math.floor(farRoom.width / 2);
+    const ty = farRoom.originY + 1;
+    paintTile(mapId, "decorations", tx, ty, "obstacle_decor");
+    placeSpawn(mapId, { x: tx, y: ty, role: "enemy", npcName: "Castle lord" });
+  }
+
+  const inside = { x: antechamber.originX + 1, y: antechamber.originY + 3 };
+  if (opts.addPlayerSpawn) {
+    placeSpawn(mapId, { ...inside, role: "player" });
+  }
+
+  // The main entrance on the antechamber's west wall is a wall opening, with a locked door
+  // unless the caller puts something else there.
+  const entrance = { x: antechamber.originX, y: antechamber.originY + 3 };
+  state.walls.data[entrance.y * state.width + entrance.x] = 0;
+  if (opts.mainDoor) {
+    placeObject(mapId, { ...entrance, kind: "door", state: "locked", pickDC: 18, name: "main-door" });
+  }
+
+  return { rooms: rooms.map((r) => r.label), entrance, inside };
+}
+
 export function registerLayoutPresetTools(server: McpServer): void {
   server.registerTool(
     "generate_crypt_layout",
@@ -160,68 +234,9 @@ export function registerLayoutPresetTools(server: McpServer): void {
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
     async ({ mapId, floorVariant, addPlayerSpawn }) => {
-      assertMinSize(mapId, "castle", "generate_castle_floor");
-      const state = getMap(mapId);
       const variant = floorVariant ?? "throne";
-      const w = state.width;
-      const h = state.height;
-      const cy = Math.floor(h / 2);
-
-      const antechamber: RoomPlan = { label: "antechamber", originX: 0, originY: cy - 3, width: 6, height: 6, exits: [{ direction: "east" }] };
-      const greatHall: RoomPlan = {
-        label: "great-hall",
-        originX: 8,
-        originY: cy - 4,
-        width: 10,
-        height: 9,
-        exits: [{ direction: "west" }, { direction: "north" }, { direction: "south" }, { direction: "east" }],
-        obstacleCorners: variant === "throne",
-      };
-      const northWing: RoomPlan = { label: "north-wing", originX: 10, originY: 0, width: 7, height: 5, exits: [{ direction: "south" }] };
-      const southWing: RoomPlan = { label: "south-wing", originX: 10, originY: h - 5, width: 7, height: 5, exits: [{ direction: "north" }] };
-      const farRoom: RoomPlan = {
-        label: variant === "throne" ? "throne-room" : variant === "private_chambers" ? "private-chambers" : "inner-courtyard",
-        originX: Math.min(w - 8, 20),
-        originY: cy - 3,
-        width: 7,
-        height: 7,
-        exits: [{ direction: "west" }],
-        obstacleCorners: variant !== "entrance",
-      };
-
-      const corridors: CorridorPlan[] = [
-        { fromX: antechamber.originX + antechamber.width, fromY: cy, toX: greatHall.originX - 1, toY: cy },
-        { fromX: greatHall.originX + greatHall.width, fromY: cy, toX: farRoom.originX - 1, toY: cy },
-        { fromX: northWing.originX + 3, fromY: northWing.originY + northWing.height, toX: northWing.originX + 3, toY: greatHall.originY - 1 },
-        { fromX: southWing.originX + 3, fromY: greatHall.originY + greatHall.height, toX: southWing.originX + 3, toY: southWing.originY - 1 },
-      ];
-
-      const rooms = [antechamber, greatHall, northWing, southWing, farRoom];
-      applyLayout(mapId, rooms, corridors);
-
-      if (variant === "throne") {
-        const tx = farRoom.originX + Math.floor(farRoom.width / 2);
-        const ty = farRoom.originY + 1;
-        paintTile(mapId, "decorations", tx, ty, "obstacle_decor");
-        placeSpawn(mapId, { x: tx, y: ty, role: "enemy", npcName: "Castle lord" });
-      }
-
-      if (addPlayerSpawn !== false) {
-        placeSpawn(mapId, { x: antechamber.originX + 1, y: antechamber.originY + 3, role: "player" });
-      }
-
-      // The main entrance on the antechamber's west wall is a locked door in a wall opening.
-      state.walls.data[(antechamber.originY + 3) * state.width + antechamber.originX] = 0;
-      placeObject(mapId, {
-        x: antechamber.originX,
-        y: antechamber.originY + 3,
-        kind: "door",
-        state: "locked",
-        pickDC: 18,
-        name: "main-door",
-      });
-
-      return asText({ ok: true, layout: "castle", variant, rooms: rooms.map((r) => r.label), summary: describeMap(mapId) });
+      const { rooms } = buildCastleFloor(mapId, variant, { addPlayerSpawn: addPlayerSpawn !== false, mainDoor: true });
+      return asText({ ok: true, layout: "castle", variant, rooms, summary: describeMap(mapId) });
     },
   );
 

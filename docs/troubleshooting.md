@@ -55,8 +55,10 @@ and pick a free floor cell. Doors are the exception: they go in wall openings.
 - `HUGGINGFACE_API_KEY (or HF_TOKEN) is not set`: add the token to `tiled-mcp/.env` or to the
   client's `env` block. See [sprite-generation.md](sprite-generation.md).
 - `The sprite already exists`: nothing was billed. Pass `force: true` to regenerate.
-- Provider or billing errors come from Hugging Face. Check that the provider (`TILED_HF_PROVIDER`,
-  default `replicate`) is enabled for your account.
+- Provider or billing errors come from Hugging Face. `We have not been able to find inference
+  provider information` means the provider in use no longer serves FLUX.1-dev: the error lists
+  the ones that do. Remove `TILED_HF_PROVIDER` to pick one automatically, or set it to one of
+  them.
 - `'sharp' could not be loaded`: run `npm install` again. Map editing works without it; only
   sprite generation and previews need it.
 - The client times out on `generate_theme_sprite_set`: use `node scripts/gen-theme-set.mjs <THEME> --yes`.

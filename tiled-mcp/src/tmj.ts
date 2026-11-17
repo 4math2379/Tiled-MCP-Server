@@ -29,10 +29,32 @@ export function relativizeImagePaths(map: TiledMap, outFile: string, root = asse
   return map;
 }
 
+/**
+ * Map JSON as written to .tmj files: indented like Tiled's own output, but every tile layer's
+ * `data` array on a single line. A 256x256 map then stays a few hundred kilobytes instead of
+ * hundreds of thousands of one-number lines.
+ */
+export function stringifyMap(map: TiledMap): string {
+  const rows: string[] = [];
+  const marker = `__tiled_layer_data_${Date.now().toString(36)}_`;
+  const text = JSON.stringify(
+    map,
+    (key, value) => {
+      if (key === "data" && Array.isArray(value)) {
+        rows.push(value.join(","));
+        return `${marker}${rows.length - 1}`;
+      }
+      return value;
+    },
+    2,
+  );
+  return `${text.replace(new RegExp(`"${marker}(\\d+)"`, "g"), (_, i: string) => `[${rows[Number(i)]}]`)}\n`;
+}
+
 /** Serialize a map and write it as a .tmj file whose sprite paths resolve from its location. */
 export async function saveMapFile(id: MapId, outFile: string): Promise<{ path: string; bytes: number }> {
   const map = relativizeImagePaths(serializeMap(id), outFile);
-  const text = `${JSON.stringify(map, null, 2)}\n`;
+  const text = stringifyMap(map);
   await mkdir(dirname(outFile), { recursive: true });
   await writeFile(outFile, text, "utf8");
   return { path: outFile, bytes: Buffer.byteLength(text) };

@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.4.0
+
+Large outdoor maps with buildings you can enter. Each building's interior is its own map,
+linked both ways. See [docs/worlds-and-buildings.md](docs/worlds-and-buildings.md).
+
+### Added
+
+- `place_building`: puts a house, shop, tavern, temple, tower or castle on an outdoor map. It
+  creates the interior map, an `entrance` on the door, an `exit` inside, and an `arrival` spawn
+  on each side.
+- `link_maps`: joins any two maps both ways with a door or stairs pair, for example castle floors.
+- `validate_world`: checks that every link leads to a map of the session and to an arrival spawn
+  there, that every link has a way back, and that every map can be entered.
+- `save_world`: writes every linked map into one folder under the file names its links use (one
+  `.zip` on the hosted server).
+- `generate_building_sprite` (paid) and `scripts/gen-building-sprites.mjs`: FLUX building
+  sprites in `assets/buildings/`, fitted to their footprint.
+- Transitions carry `targetMap`, a Tiled `file` property that opens the target map on
+  right-click, and `targetSpawn`. Spawns gain the `arrival` role.
+- A Godot 4 loader for the transitions, in the new guide.
+
+### Changed
+
+- Maps go up to 256x256 cells (128x128 in hosted mode); `TILED_MAX_MAP_SIZE` changes the limit.
+- Saved and exported maps write each tile layer's `data` on one line, so large maps stay small.
+- The preview renderer draws large maps directly at reduced scale (a 256x256 map renders in about
+  a second) and draws building sprites, with placeholders when they are missing.
+- `validate_map` accepts an arrival point instead of a player spawn, as on interiors.
+- The castle preset is reusable: `generate_castle_floor` behaves as before.
+- The web page's agent can place buildings: the preview shows the map the player starts on and
+  the `.zip` holds it with every linked interior. A **Village (enter buildings)** example shows it.
+- Sample world `maps/crossroads-village/` (`scripts/create-village-world.mjs`, part of
+  `npm run examples`), with building sprites for all six types in `assets/buildings/`.
+- The scripted sample maps are saved again in the compact format: same content, a quarter of the
+  size.
+
+### Fixed
+
+- Sprite generation failed with "We have not been able to find inference provider information"
+  because Replicate no longer serves FLUX.1-dev. By default the server now uses the first
+  provider Hugging Face lists as live for the model (fal-ai today) and sends the image size in
+  the form that provider reads. `TILED_HF_PROVIDER` still forces one, and a provider error now
+  names the providers that serve the model.
+- Building sprites kept a translucent veil or grey specks when the provider did not paint a
+  clean magenta background. Generation now isolates the building from what remains around it
+  and refills enclosed see-through spots such as windows;
+  `node scripts/gen-building-sprites.mjs --clean` repairs existing sprites for free.
+
 ## 0.3.0
 
 A hosted mode, published as a Hugging Face Space.

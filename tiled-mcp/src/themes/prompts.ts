@@ -1119,6 +1119,30 @@ export interface RenderedPrompt {
   dimensions: { width: number; height: number };
 }
 
+const BUILDING_TEMPLATE = (material: string, lighting: string) =>
+  `isometric view at 30 degree angle of a single ${material}, seen from the south with two walls visible, ` +
+  `hand-painted digital illustration, painterly oil paint style, ${lighting}, ` +
+  `gothic horror dark fantasy palette, decayed elegance, faded grandeur, brooding melancholy, ` +
+  `the whole building fully visible from roof to base and centered, standing on a small flat diamond-shaped patch of ground, ` +
+  `smooth lines no 3D ray-traced effects, no depth-of-field, ` +
+  `single isolated building on pure bright magenta solid background, ` +
+  `chroma key background #FF00FF, ` +
+  `${POSITIVE_FRAMING}, game asset for 2D tactical RPG`;
+
+export const BUILDING_LIGHTING = "soft overcast daylight from the upper left, muted desaturated colours";
+
+/** FLUX prompt for a building sprite (see src/buildings.ts for the subjects and sizes). */
+export function buildBuildingPrompt(
+  material: string,
+  overrides?: { lighting?: string; extraDetail?: string },
+): { prompt: string; dimensions: { width: number; height: number } } {
+  const base = BUILDING_TEMPLATE(material, overrides?.lighting ?? BUILDING_LIGHTING);
+  return {
+    prompt: overrides?.extraDetail ? `${base}, ${overrides.extraDetail}` : base,
+    dimensions: { width: 1024, height: 1024 },
+  };
+}
+
 /**
  * Build a final prompt string for FLUX-dev based on theme + role + optional
  * overrides. Returns the prompt plus the target geometry (used to set the

@@ -6,6 +6,7 @@ const $ = (id) => document.getElementById(id);
 const STORE_KEY = "tiled.hf";
 
 const EXAMPLES = [
+  ["Village (enter buildings)", "A village crossroads 48x48 with cobbled roads, two houses, a shop, a tavern, a chapel, a watchtower and a castle on the hill. Every building can be entered. The player starts at the edge of the south road."],
   ["Crypt", "A crypt 28x18 under an abandoned chapel: two skeletons patrol the nave, a ghoul lord sleeps in the deep crypt behind a locked door (DC 15), and a poison trap guards the reliquary."],
   ["Ice fortress", "A frozen fortress 30x22: a great hall with ice pillars, a throne room at the far end where a frost giant waits, two guard rooms, and slippery ice in the corridors."],
   ["Tavern", "A cozy tavern 20x14 with a bar, tables, a hearth and stairs to the cellar. The innkeeper and three patrons are friendly NPCs; a thief hides in the storeroom."],
@@ -156,7 +157,11 @@ function showResult(e) {
   $("result-title").textContent = `${e.map.name} (${e.map.theme}, ${e.map.width}x${e.map.height})`;
   $("dl-zip").href = e.zipUrl;
   $("dl-tmj").href = e.tmjUrl;
-  $("dl-note").textContent = `Download links last one hour (until ${new Date(e.expiresAt).toLocaleTimeString()}). The .zip holds the .tmj and its sprites; open the .tmj in Tiled.`;
+  const linked = (e.maps ?? []).length > 1;
+  $("dl-note").textContent = `Download links last one hour (until ${new Date(e.expiresAt).toLocaleTimeString()}). ` +
+    (linked
+      ? `The .zip holds ${e.maps.length} linked maps side by side (${e.maps[0].fileName} and one interior per building) with their sprites. Open ${e.maps[0].fileName} in Tiled; right-click an entrance's targetMap to open the building's interior.`
+      : "The .zip holds the .tmj and its sprites; open the .tmj in Tiled.");
   $("preview").src = e.previewPng;
   $("warnings").replaceChildren(...e.warnings.map((w) => el("li", {}, w)));
   $("report").textContent = e.report;

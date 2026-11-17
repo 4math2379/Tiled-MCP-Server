@@ -12,8 +12,15 @@ npm run preview -- maps/forteresse-glace-etage.tmj
 | `caverne-aquatique.tmj` | `AQUATIC` | 64x64 | `scripts/create-aquatic-map.mjs` |
 | `forteresse-glace-etage.tmj` | `GLACIAIRE` | 64x64 | `scripts/create-glacier-map.mjs` |
 | `reseau-electronique-repaire-hacker.tmj` | `ELECTRONIQUE` | 64x64 | `scripts/create-electronic-hacker-map.mjs` |
+| `crossroads-village/` | `VILLAGE` and interiors | 40x40 + 7 maps | `scripts/create-village-world.mjs` |
 
-The three scripted maps are deterministic: `npm run examples` rebuilds them identically.
+`crossroads-village/` is a sample **world**: an outdoor map with six buildings you can enter
+(house, shop, tavern, chapel, watchtower, castle), the interior map of each, and a cellar under
+the castle reached by stairs. Open `crossroads-village/crossroads-village.tmj`; in Tiled, select
+an entrance on the `objects` layer and right-click its `targetMap` property to open the interior.
+How the links work, and a Godot loader: [docs/worlds-and-buildings.md](../docs/worlds-and-buildings.md).
+
+The scripted maps and the world are deterministic: `npm run examples` rebuilds them identically.
 
 This folder is also the default output of `save_to_disk` for relative paths (change it with
 `TILED_MAPS_DIR`). Sprite paths in these files point to `../assets/`, so keep the maps inside the

@@ -36,7 +36,8 @@
 
 ## ✨ Features
 
-- 🗺️ **30 MCP tools** to create maps, paint tiles, generate rooms and corridors, and place doors, chests, traps, levers, stairs and spawns.
+- 🗺️ **35 MCP tools** to create maps up to 256x256, paint tiles, generate rooms and corridors, and place doors, chests, traps, levers, stairs and spawns.
+- 🏘️ **Buildings you can enter**: put houses, taverns, temples, towers or castles on an outdoor map; each gets its own interior map, linked both ways, ready to load in a game ([guide with a Godot loader](docs/worlds-and-buildings.md)).
 - 🏰 **3 layout presets**: a crypt, a castle floor and a werewolf den, each built in one call.
 - 🎨 **20 themes**, 12 of them with bundled isometric sprites ready to use.
 - 🛡️ **Guard rails for agents**: placing a chest on a wall, outside a room or on another object fails with a message that says how to fix it, and `validate_map` checks the map before export.
@@ -53,6 +54,10 @@ sign in with Hugging Face, describe a map in any language and download a `.zip` 
 Tiled. The AI model (default `openai/gpt-oss-120b`) runs on **your** Hugging Face inference
 credits, usually a few cents per map; the Space owner pays nothing for your use and never sees
 your token.
+
+New: try the **Village (enter buildings)** example. The model builds an outdoor map with houses,
+a tavern, a chapel, a tower and a castle; each building gets its own interior map, and the
+`.zip` holds them all, linked both ways.
 
 AI agents can use the same Space as a remote MCP server with their own token:
 
@@ -75,6 +80,13 @@ How it works, costs, other clients, and running your own copy: **[docs/hugging-f
   <img src="docs/images/preview-ice-fortress.png" alt="64x64 ice fortress sample map" width="49%">
   <img src="docs/images/preview-aquatic-cavern.png" alt="64x64 flooded cavern sample map" width="49%">
   <br><sub>Sample maps in <a href="maps/"><code>maps/</code></a>: an ice fortress and a flooded cavern, both 64x64.</sub>
+</p>
+
+<p align="center">
+  <img src="docs/images/preview-crossroads-village.png" alt="40x40 village with a house, a shop, a tavern, a chapel, a watchtower and a castle, each with an entrance and an arrival point" width="85%">
+  <br><sub>The sample world <a href="maps/crossroads-village/"><code>maps/crossroads-village/</code></a>: six buildings from <code>place_building</code>.
+  Walking onto an entrance (<b>I</b>) loads the building's interior map; its exit brings you back to the arrival point (<b>A</b>).
+  See <a href="docs/worlds-and-buildings.md">worlds and buildings</a>.</sub>
 </p>
 
 ## 🧱 Tech stack
@@ -164,8 +176,9 @@ Details, properties and importer formulas: **[docs/map-format.md](docs/map-forma
 | Layout presets | `generate_crypt_layout` (27x18+) · `generate_castle_floor` (27x20+) · `generate_werewolf_den` (22x16+) |
 | Objects | `place_door` · `place_chest` · `place_stairs_object` · `place_trap` · `place_lever` |
 | Spawns | `place_spawn_player` · `place_spawn_enemy` · `place_spawn_npc` |
+| Buildings and linked maps | `place_building` · `link_maps` · `validate_world` · `save_world` |
 | Validation and export | `validate_map` · `export_json` · `save_to_disk` |
-| Sprites | `preview_sprite_prompt` (free) · `generate_tile_sprite` 💸 · `generate_theme_sprite_set` 💸 · `override_tile_image` |
+| Sprites | `preview_sprite_prompt` (free) · `generate_tile_sprite` 💸 · `generate_theme_sprite_set` 💸 · `generate_building_sprite` 💸 · `override_tile_image` |
 
 Full parameters, generated from the server itself: **[docs/tools.md](docs/tools.md)**.
 
@@ -268,14 +281,15 @@ docs/               documentation, banner and preview images
 | Command | What it does |
 |---|---|
 | `npm run build` | Compile the server |
-| `npm run smoke` | Start the server and run 38 offline end-to-end checks |
+| `npm run smoke` | Start the server and run 62 offline end-to-end checks |
 | `npm run start:web` | Start the hosted mode (web page and MCP over HTTP) on port 7860 |
 | `npm run smoke:http` | Test the hosted mode offline, with a stand-in for the AI model |
 | `npm run inspect` | Open the server in the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) |
 | `npm run preview -- <map.tmj>` | Render a map to PNG without Tiled |
-| `npm run examples` | Rebuild the three scripted sample maps in `maps/` |
+| `npm run examples` | Rebuild the scripted sample maps and the sample world in `maps/` |
 | `npm run docs` | Regenerate `docs/tools.md` and `docs/themes.md` from the server |
 | `node scripts/gen-theme-set.mjs <THEME> --yes` | Generate a theme's missing sprites (paid) |
+| `node scripts/gen-building-sprites.mjs --yes` | Generate missing building sprites (paid); `--clean` re-cuts existing ones for free |
 
 ## 🤝 Contributing
 

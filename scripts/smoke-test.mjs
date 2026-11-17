@@ -54,7 +54,7 @@ check("initialize", init.result?.serverInfo?.name === "tiled-map-builder", init.
 notify("notifications/initialized", {});
 
 const tools = (await rpc("tools/list", {})).result.tools;
-check("30 tools listed", tools.length === 30, tools.length);
+check("35 tools listed", tools.length === 35, tools.length);
 const nonAscii = tools.filter((t) => /[^\x00-\x7F]/.test(JSON.stringify([t.title, t.description, t.inputSchema])));
 check("tool text is plain English/ASCII", nonAscii.length === 0, nonAscii.map((t) => t.name));
 check("every tool has annotations", tools.every((t) => t.annotations && typeof t.annotations.readOnlyHint === "boolean"), tools.filter((t) => !t.annotations).map((t) => t.name));
@@ -155,6 +155,71 @@ check("orthogonal spawn point at tile centre", ps.point && ps.x === 2.5 * 64 && 
 check("orthogonal door rect", door.x === 3 * 64 && door.y === 7 * 32 && door.width === 64, door);
 const badExit = await call("generate_room", { mapId: om.mapId, originX: 0, originY: 0, width: 5, height: 5, exits: [{ direction: "north", offset: 9 }] });
 check("exit offset past the wall rejected", badExit.isError, badExit);
+
+// Worlds: a 256x256 outdoor map with buildings whose interiors are linked maps
+const tooBig = await call("create_map", { name: "too big", width: 300, height: 10, theme: "VILLAGE" });
+check("maps above 256 cells per side are rejected", tooBig.isError || tooBig.protocolError, tooBig);
+const out = (await call("create_map", { name: "Smoke village", width: 256, height: 256, theme: "VILLAGE" })).data;
+check("256x256 outdoor map created", out.mapId && out.summary.fileName === "smoke-village.tmj", out);
+await call("paint_rect", { mapId: out.mapId, layer: "ground", x1: 0, y1: 0, x2: 255, y2: 255, role: "walkable_floor" });
+await call("paint_tile", { mapId: out.mapId, layer: "decorations", x: 11, y: 11, role: "obstacle_decor" });
+const house = (await call("place_building", { mapId: out.mapId, buildingType: "house", x: 10, y: 10, name: "Miller house" })).data;
+check("house placed with a linked interior", house.ok && house.buildingId === "miller-house" && house.interior?.fileName === "miller-house-interior.tmj", house);
+check("house entrance on the south edge, arrival in front", house.entrance.x === 11 && house.entrance.y === 12 && house.outsideArrival.y === 13, house);
+check("props under the footprint are cleared", house.clearedProps === 1, house.clearedProps);
+const overlap = await call("place_building", { mapId: out.mapId, buildingType: "house", x: 11, y: 11 });
+check("overlapping footprint rejected", overlap.isError, overlap);
+const castle = (await call("place_building", { mapId: out.mapId, buildingType: "castle", x: 40, y: 40, door: "east" })).data;
+check("castle placed with a castle-floor interior", castle.ok && castle.interior.width === 27 && castle.entrance.x === 45, castle);
+const tower = (await call("place_building", { mapId: out.mapId, buildingType: "tower", x: 70, y: 20, interior: false })).data;
+check("building without interior has no entrance", tower.ok && tower.interior === null && !tower.entrance, tower);
+const cellar = (await call("create_map", { name: "Castle cellar", width: 12, height: 10, theme: "CRYPT" })).data;
+await call("generate_room", { mapId: cellar.mapId, originX: 0, originY: 0, width: 12, height: 10 });
+const link = (await call("link_maps", { fromMapId: castle.interior.mapId, fromX: 12, fromY: 8, toMapId: cellar.mapId, toX: 5, toY: 4, kind: "stairs" })).data;
+check("link_maps joins castle and cellar both ways", link.ok && link.from.arrival.name && link.to.object.name, link);
+await call("place_spawn_player", { mapId: out.mapId, x: 5, y: 5 });
+const interiorCheck = (await call("validate_map", { mapId: house.interior.mapId })).data;
+check("interior with an arrival point needs no player spawn", !interiorCheck.warnings.some((w) => /player/.test(w)), interiorCheck);
+const world = (await call("validate_world", { mapId: out.mapId })).data;
+check("world validates: 4 linked maps, no errors", world.ok && world.maps.length === 4 && world.errors.length === 0, world);
+check("world has no one-way links", !world.warnings.some((w) => /no way back/.test(w)), world.warnings);
+check("world start map is the outdoor map", world.startMaps.length === 1 && world.startMaps[0] === "smoke-village.tmj", world.startMaps);
+
+const savedWorld = (await call("save_world", { mapId: out.mapId, folder: "world" })).data;
+check("save_world writes the 4 maps side by side", savedWorld.ok && savedWorld.files.length === 4, savedWorld);
+const outText = readFileSync(resolve(outDir, "world/smoke-village.tmj"), "utf8");
+const outFile = JSON.parse(outText);
+check("tile layer data written on one line each", outText.split("\n").length < 600, outText.split("\n").length);
+const bTileset = outFile.tilesets.find((t) => t.name === "buildings");
+check("buildings tileset after the theme tileset, bottom aligned", bTileset && bTileset.firstgid === outFile.tilesets[0].tilecount + 1 && bTileset.objectalignment === "bottom", bTileset);
+const bLayer = outFile.layers.find((l) => l.name === "buildings");
+const houseObj = bLayer?.objects.find((o) => o.name === "Miller house");
+// Bottom corner of the footprint = tile point (13, 13): Tiled space (13*th, 13*th), legacy screen space (tw/2*(13-13), th/2*(13+13)).
+const anchor = mode === "screen" ? { x: 0, y: 13 * 32 } : { x: 13 * 32, y: 13 * 32 };
+check("house is a tile object anchored on the footprint's bottom corner", houseObj && houseObj.gid >= bTileset.firstgid && houseObj.x === anchor.x && houseObj.y === anchor.y && houseObj.width === 192, houseObj);
+check("buildings layer sits before objects and spawns", outFile.layers.map((l) => l.name).join(",") === "ground,walls,decorations,buildings,objects,spawns", outFile.layers.map((l) => l.name));
+const entrance = outFile.layers.find((l) => l.name === "objects").objects.find((o) => o.name === "miller-house-entrance");
+const targetMap = entrance?.properties.find((p) => p.name === "targetMap");
+const targetSpawn = entrance?.properties.find((p) => p.name === "targetSpawn")?.value;
+check("entrance targetMap is a file property naming the interior", targetMap?.type === "file" && targetMap.value === "miller-house-interior.tmj", entrance);
+const interiorFile = JSON.parse(readFileSync(resolve(outDir, "world", targetMap.value), "utf8"));
+check("interior holds the entrance's targetSpawn", interiorFile.layers.find((l) => l.name === "spawns").objects.some((o) => o.name === targetSpawn), targetSpawn);
+const exitObj = interiorFile.layers.find((l) => l.name === "objects").objects.find((o) => o.type === "exit");
+check("interior exit leads back to the outdoor map", exitObj?.properties.some((p) => p.name === "targetMap" && p.value === "smoke-village.tmj"), exitObj);
+check("interior records its parent map", interiorFile.properties.some((p) => p.name === "parentMap" && p.type === "file" && p.value === "smoke-village.tmj"), interiorFile.properties);
+
+const { renderMapPreview } = await import("../tiled-mcp/dist/render.js");
+const t0 = Date.now();
+const png = await renderMapPreview(outFile, (image) => {
+  try { return readFileSync(resolve(outDir, "world", image)); } catch { return undefined; }
+}, { maxWidth: 1600 });
+const ms = Date.now() - t0;
+const width = png.readUInt32BE(16);
+check(`256x256 preview renders at 1600 px wide (${ms} ms)`, width === 1600 && ms < 60000, { width, ms });
+
+await call("discard_map", { mapId: house.interior.mapId });
+const broken = (await call("validate_world", { mapId: out.mapId })).data;
+check("a discarded interior is reported as a broken link", !broken.ok && broken.errors.some((e) => /miller-house-entrance/.test(e)), broken.errors);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (stderr.trim()) console.log("SERVER STDERR:", stderr.slice(0, 500));

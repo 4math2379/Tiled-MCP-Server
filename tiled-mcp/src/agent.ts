@@ -6,9 +6,10 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { readFile } from "node:fs/promises";
-import { describeMap, listMaps, serializeMap, type MapSummary } from "./builder.js";
+import { allMaps, describeMap, listMaps, serializeMap, type MapSummary } from "./builder.js";
 import { newWorkspace, runInScope } from "./context.js";
-import { publishMap, slugify } from "./downloads.js";
+import { publishMap, publishTmj, publishWorld, slugify } from "./downloads.js";
+import { validateWorld, worldOf } from "./world.js";
 import { skillFile } from "./paths.js";
 import { renderMapPreview } from "./render.js";
 import { createServer, SERVER_VERSION } from "./server.js";
@@ -34,7 +35,16 @@ const MAX_TOOL_CALLS = 160;
 const TOOL_RESULT_CHARS = 12_000;
 
 /** Tools the web agent never sees: the page handles the output, and one job builds one map. */
-const HIDDEN_TOOLS = new Set(["save_to_disk", "export_json", "list_maps", "discard_map", "generate_theme_sprite_set"]);
+const HIDDEN_TOOLS = new Set([
+  "save_to_disk",
+  "export_json",
+  "list_maps",
+  "discard_map",
+  "generate_theme_sprite_set",
+  "save_world",
+  // Every building type already ships a sprite; generating new ones is for MCP clients.
+  "generate_building_sprite",
+]);
 /** Offered only when the visitor allows paid sprite generation. */
 const PAID_TOOLS = new Set(["generate_tile_sprite", "preview_sprite_prompt"]);
 
@@ -55,6 +65,8 @@ export type AgentEvent =
   | {
       type: "done";
       map: MapSummary;
+      /** Every map in the download: the main map first, then linked interiors. */
+      maps: Array<{ name: string; fileName: string }>;
       report: string;
       warnings: string[];
       previewPng: string;
@@ -186,7 +198,15 @@ async function agentLoop(req: AgentRequest, ctx: AgentContext): Promise<void> {
       }
     }
 
-    const built = listMaps().sort((a, b) => b.createdAt - a.createdAt)[0];
+    // The main map is the one the player starts on (place_building's interiors only have arrival
+    // points); without any player spawn, the newest map.
+    const byNewest = listMaps().sort((a, b) => b.createdAt - a.createdAt);
+    const hasPlayer = new Set(
+      allMaps()
+        .filter((s) => s.spawns.objects.some((o) => o.properties?.some((p) => p.name === "role" && p.value === "player")))
+        .map((s) => s.id),
+    );
+    const built = byNewest.find((m) => hasPlayer.has(m.mapId)) ?? byNewest[0];
     if (!built) {
       throw new AgentError(
         `${model} stopped without creating a map. Try again with more detail, or pick another model.${report ? ` Its last answer: ${report.slice(0, 300)}` : ""}`,
@@ -196,17 +216,26 @@ async function agentLoop(req: AgentRequest, ctx: AgentContext): Promise<void> {
     const validation = JSON.parse(
       resultText((await client.callTool({ name: "validate_map", arguments: { mapId: built.mapId } })).content),
     ) as { warnings?: string[] };
+    const world = worldOf(built.mapId);
+    const worldCheck = world.length > 1 ? validateWorld(built.mapId) : undefined;
     const preview = await renderMapPreview(
       serializeMap(built.mapId),
       (image) => (image.startsWith(ASSET_PREFIX) ? readSprite(image.slice(ASSET_PREFIX.length)) : undefined),
       { maxWidth: 1400 },
     );
-    const links = publishMap(built.mapId, `${slugify(built.name)}.tmj`);
+    // Linked maps (building interiors) travel together in one .zip, under the names their links use.
+    const links = worldCheck
+      ? (() => {
+          const packed = publishWorld(world.map((s) => s.id), built.name);
+          return { zipUrl: packed.zipUrl, tmjUrl: publishTmj(built.mapId, built.fileName), expiresAt: packed.expiresAt };
+        })()
+      : publishMap(built.mapId, `${slugify(built.name)}.tmj`);
     ctx.emit({
       type: "done",
       map: describeMap(built.mapId),
+      maps: world.map((s) => ({ name: s.name, fileName: s.fileName })),
       report: report || "The map is ready.",
-      warnings: validation.warnings ?? [],
+      warnings: [...(validation.warnings ?? []), ...(worldCheck ? [...worldCheck.errors, ...worldCheck.warnings] : [])],
       previewPng: `data:image/png;base64,${preview.toString("base64")}`,
       zipUrl: links.zipUrl,
       tmjUrl: links.tmjUrl,
@@ -226,8 +255,9 @@ function systemPrompt(skill: string, allowPaid: boolean): string {
     "",
     "This session differs from the skill below in these ways:",
     "- The person cannot answer while you work. Never ask questions or wait for confirmation: make sensible choices and build the map right away. Sketch the layout for yourself if it helps, but do not ask for approval.",
-    "- Build exactly one map with create_map. When a call fails, read the error, fix the arguments and carry on.",
-    "- Finish with validate_map and fix every warning; the map needs at least one player spawn.",
+    "- Build exactly one map with create_map: the map the person asked for. When a call fails, read the error, fix the arguments and carry on.",
+    "- For a village, town, district or region with buildings people can enter (houses, shops, a tavern, a temple, a tower, a castle), make an outdoor map (VILLAGE theme unless the request says otherwise, about 40x40 to 64x64), paint its whole ground with paint_rect, add roads, then add each building with place_building. place_building creates and links the building's interior map by itself: never call create_map for an interior. Keep the cell in front of each door free.",
+    "- Finish with validate_map and fix every warning; the main map needs at least one player spawn. After place_building, also run validate_world and fix its errors.",
     "- Do not save or export the map: the web page offers the download.",
     '- Prefer themes whose sprites.status is "all" in list_themes. Themes without sprites still work but show grey placeholder tiles in the preview and in Tiled: use one only when the person asks for it or nothing else fits.',
     allowPaid

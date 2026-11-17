@@ -8,7 +8,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { buildPrompt, NEGATIVE_PROMPT, type ThemeKey } from "../themes/prompts.js";
+import { buildBuildingPrompt, buildPrompt, NEGATIVE_PROMPT, type ThemeKey } from "../themes/prompts.js";
+import { BUILDINGS, BUILDING_TYPES, buildingSpriteFile } from "../buildings.js";
 import { THEME_KEYS, themeAssetDir } from "../themes/index.js";
 import { THEME_ROLES } from "../types.js";
 import { getMap, overrideTileImage } from "../builder.js";
@@ -88,8 +89,50 @@ function hfToken(): string | null {
   return process.env.HUGGINGFACE_API_KEY || process.env.HF_TOKEN || null;
 }
 
-function hfProvider(): string {
-  return process.env.TILED_HF_PROVIDER || "replicate";
+const FLUX_MODEL = "black-forest-labs/FLUX.1-dev";
+/** How long the provider picked automatically is reused before asking the Hub again. */
+const PROVIDER_TTL_MS = 60 * 60 * 1000;
+let autoProvider: { name: string; at: number } | undefined;
+
+/**
+ * Providers routing FLUX.1-dev right now, from the Hub's public routing table. The list changes
+ * over time (Replicate stopped serving the model in 2026), so it is never hard-coded.
+ */
+async function fluxProviders(): Promise<Array<{ provider: string; status: string }>> {
+  const res = await fetch(`https://huggingface.co/api/models/${FLUX_MODEL}?expand[]=inferenceProviderMapping`);
+  if (!res.ok) throw new Error(`Hugging Face did not return the providers of ${FLUX_MODEL} (HTTP ${res.status}).`);
+  const raw = ((await res.json()) as { inferenceProviderMapping?: unknown }).inferenceProviderMapping;
+  if (Array.isArray(raw)) {
+    return raw.map((m: { provider?: unknown; status?: unknown }) => ({ provider: String(m.provider), status: String(m.status) }));
+  }
+  return Object.entries((raw ?? {}) as Record<string, { status?: unknown }>).map(([provider, m]) => ({
+    provider,
+    status: String(m?.status),
+  }));
+}
+
+/** TILED_HF_PROVIDER when set (other than "auto"), otherwise the first provider live for FLUX.1-dev. */
+export async function resolveFluxProvider(): Promise<string> {
+  const configured = process.env.TILED_HF_PROVIDER?.trim();
+  if (configured && configured.toLowerCase() !== "auto") return configured;
+  if (!autoProvider || Date.now() - autoProvider.at > PROVIDER_TTL_MS) {
+    const live = (await fluxProviders()).filter((p) => p.status === "live");
+    if (!live.length) throw new Error(`No Inference Provider serves ${FLUX_MODEL} right now: see https://huggingface.co/${FLUX_MODEL}.`);
+    autoProvider = { name: live[0].provider, at: Date.now() };
+  }
+  return autoProvider.name;
+}
+
+/** Image size in the parameter shape each provider reads (they pass parameters through as is). */
+function sizeParameters(provider: string, d: { width: number; height: number }): Record<string, unknown> {
+  switch (provider) {
+    case "fal-ai":
+      return { image_size: { width: d.width, height: d.height } };
+    case "wavespeed":
+      return { size: `${d.width}*${d.height}` };
+    default:
+      return { width: d.width, height: d.height };
+  }
 }
 
 function missingToken() {
@@ -106,25 +149,203 @@ function missingToken() {
       };
 }
 
+/**
+ * One FLUX.1-dev call; returns the image with its magenta background made transparent, and the
+ * provider that served it. A provider error says which providers serve the model now.
+ */
+async function fluxKeyed(
+  sharp: Sharp,
+  prompt: string,
+  dimensions: { width: number; height: number },
+  seed?: number,
+): Promise<{ keyed: Buffer; provider: string }> {
+  const provider = await resolveFluxProvider();
+  const parameters: Record<string, unknown> = {
+    ...sizeParameters(provider, dimensions),
+    negative_prompt: NEGATIVE_PROMPT,
+    guidance_scale: 4.5,
+    ...(seed !== undefined ? { seed } : {}),
+  };
+  const { InferenceClient } = await import("@huggingface/inference");
+  const client = new InferenceClient(hfToken()!);
+  let blob: Blob;
+  try {
+    blob = (await client.textToImage({
+      model: FLUX_MODEL,
+      provider: provider as never,
+      inputs: prompt,
+      parameters: parameters as never,
+    })) as unknown as Blob;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (!/provider/i.test(message)) throw err;
+    const live = await fluxProviders()
+      .then((list) => list.filter((p) => p.status === "live").map((p) => p.provider))
+      .catch(() => [] as string[]);
+    throw new Error(
+      `${message} Provider used: ${provider}. Providers serving ${FLUX_MODEL} now: ${live.join(", ") || "unknown"}. Set TILED_HF_PROVIDER to one of them, or remove it to pick one automatically.`,
+    );
+  }
+  return { keyed: await chromaKeyMagenta(sharp, Buffer.from(await blob.arrayBuffer())), provider };
+}
+
 /** Generate one sprite PNG and return the processed bytes. */
 async function renderSprite(prompt: ReturnType<typeof buildPrompt>, seed?: number) {
   const sharp = await loadSharp();
-  const { InferenceClient } = await import("@huggingface/inference");
-  const client = new InferenceClient(hfToken()!);
-  const blob = (await client.textToImage({
-    model: "black-forest-labs/FLUX.1-dev",
-    provider: hfProvider() as never,
-    inputs: prompt.prompt,
-    parameters: {
-      width: prompt.dimensions.width,
-      height: prompt.dimensions.height,
-      negative_prompt: NEGATIVE_PROMPT,
-      guidance_scale: 4.5,
-      ...(seed !== undefined ? { seed } : {}),
-    },
-  })) as unknown as Blob;
-  const raw = Buffer.from(await blob.arrayBuffer());
-  return resizeForTile(sharp, await chromaKeyMagenta(sharp, raw), prompt.geometry);
+  const { keyed } = await fluxKeyed(sharp, prompt.prompt, prompt.dimensions, seed);
+  return resizeForTile(sharp, keyed, prompt.geometry);
+}
+
+/** Pixels with less alpha than this count as background when the key left a veil or specks. */
+const SOLID_ALPHA = 250;
+/** Pixels with less alpha than this count as background when the key left a clean border. */
+const CLEAR_ALPHA = 32;
+
+/**
+ * Keep only the building of a keyed image, cropped to it. FLUX does not always paint a clean
+ * magenta background (fal-ai often returns a pale pink or a grey noisy one), so the chroma key
+ * can leave a translucent veil or specks; it can also half-erase purple-grey parts of the
+ * building such as slate roofs. Here:
+ * - background is what connects to the image border through see-through pixels: any pixel
+ *   that is not fully opaque when the border holds a veil or specks, only nearly transparent
+ *   ones when the border is already clean (so a half-keyed roof is not swept away);
+ * - of the rest, only the largest connected shape is kept, which drops opaque specks;
+ * - see-through pixels enclosed by the building (windows or roof tiles keyed out because they
+ *   looked magenta) become opaque again.
+ */
+async function isolateSubject(sharp: Sharp, buf: Buffer): Promise<Buffer> {
+  const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const w = info.width;
+  const h = info.height;
+  const n = w * h;
+  let borderPixels = 0;
+  let clearBorder = 0;
+  for (let i = 0; i < n; i++) {
+    const x = i % w;
+    if (x !== 0 && x !== w - 1 && i >= w && i < n - w) continue;
+    borderPixels++;
+    if (data[i * 4 + 3] < CLEAR_ALPHA) clearBorder++;
+  }
+  const threshold = clearBorder >= 0.9 * borderPixels ? CLEAR_ALPHA : SOLID_ALPHA;
+  const background = new Uint8Array(n);
+  const stack: number[] = [];
+  const reach = (i: number) => {
+    if (!background[i] && data[i * 4 + 3] < threshold) {
+      background[i] = 1;
+      stack.push(i);
+    }
+  };
+  for (let x = 0; x < w; x++) {
+    reach(x);
+    reach((h - 1) * w + x);
+  }
+  for (let y = 0; y < h; y++) {
+    reach(y * w);
+    reach(y * w + w - 1);
+  }
+  while (stack.length) {
+    const i = stack.pop()!;
+    const x = i % w;
+    if (x > 0) reach(i - 1);
+    if (x < w - 1) reach(i + 1);
+    if (i >= w) reach(i - w);
+    if (i < n - w) reach(i + w);
+  }
+
+  // Largest 8-connected shape among the remaining pixels.
+  const label = new Int32Array(n);
+  let best = 0;
+  let bestSize = 0;
+  let next = 0;
+  for (let s = 0; s < n; s++) {
+    if (background[s] || label[s]) continue;
+    label[s] = ++next;
+    let size = 0;
+    stack.push(s);
+    while (stack.length) {
+      const i = stack.pop()!;
+      size++;
+      const x = i % w;
+      const y = (i - x) / w;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const xx = x + dx;
+          const yy = y + dy;
+          if ((!dx && !dy) || xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
+          const j = yy * w + xx;
+          if (!background[j] && !label[j]) {
+            label[j] = next;
+            stack.push(j);
+          }
+        }
+      }
+    }
+    if (size > bestSize) {
+      bestSize = size;
+      best = next;
+    }
+  }
+  if (!best) return buf;
+
+  const out = Buffer.from(data);
+  let minX = w;
+  let minY = h;
+  let maxX = -1;
+  let maxY = -1;
+  for (let i = 0; i < n; i++) {
+    const p = i * 4;
+    if (label[i] !== best) {
+      out[p] = out[p + 1] = out[p + 2] = out[p + 3] = 0;
+      continue;
+    }
+    const x = i % w;
+    const y = (i - x) / w;
+    if (data[p + 3] < 255) {
+      const touchesBackground =
+        (x > 0 && background[i - 1]) || (x < w - 1 && background[i + 1]) || (y > 0 && background[i - w]) || (y < h - 1 && background[i + w]);
+      if (!touchesBackground) out[p + 3] = 255;
+    }
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  return sharp(out, { raw: { width: w, height: h, channels: 4 } })
+    .extract({ left: minX, top: minY, width: maxX - minX + 1, height: maxY - minY + 1 })
+    .png()
+    .toBuffer();
+}
+
+/**
+ * Turn a generated (or hand-made) building image into its sprite: isolate the building from its
+ * background, then fit it into width x height standing on the bottom edge. Exported for
+ * scripts/gen-building-sprites.mjs --clean, which repairs existing sprites for free.
+ */
+export async function cleanBuildingSprite(buf: Buffer, width: number, height: number): Promise<Buffer> {
+  const sharp = await loadSharp();
+  return fitBuilding(sharp, await isolateSubject(sharp, buf), width, height);
+}
+
+/**
+ * Fit a keyed building image into its sprite size: trim the transparent margin, then scale it
+ * to fit, standing on the bottom edge (the tile object's anchor) and centred horizontally.
+ */
+async function fitBuilding(sharp: Sharp, buf: Buffer, width: number, height: number): Promise<Buffer> {
+  let trimmed = buf;
+  try {
+    trimmed = await sharp(buf).trim().toBuffer();
+  } catch {
+    // Nothing to trim (uniform image): keep it whole.
+  }
+  return sharp(trimmed)
+    .resize(width, height, {
+      fit: "contain",
+      position: "south",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+      kernel: "lanczos3",
+    })
+    .png()
+    .toBuffer();
 }
 
 const THEME = z.enum(THEME_KEYS).describe("Theme key from list_themes");
@@ -279,6 +500,76 @@ export function registerGenerationTools(server: McpServer): void {
         return asText({ ok: true, ...buildPrompt(theme as ThemeKey, role, { material, lighting, extraDetail }) });
       } catch (err) {
         return asText({ ok: false, error: err instanceof Error ? err.message : String(err) });
+      }
+    },
+  );
+
+  server.registerTool(
+    "generate_building_sprite",
+    {
+      title: "Generate a building sprite (paid)",
+      description:
+        `PAID unless dryRun is true: generates the sprite place_building draws for a building type (${BUILDING_TYPES.join(", ")}) with FLUX.1-dev via Hugging Face Inference Providers, removes the magenta background and fits the building into its footprint size (house and shop 192x192, tavern and temple 256x256, tower 128x192, castle 384x384). ` +
+        (isHosted()
+          ? "The sprite is returned as an image and kept with your session as buildings/<type>.png (or <type>__<variant>.png); maps of this session use it in previews and downloads. "
+          : "Saves <assets>/buildings/<type>.png, or <type>__<variant>.png when variant is set. ") +
+        "Takes 20-40 s and costs money per call; dryRun returns the prompt for free. An existing sprite is kept unless force is true.",
+      inputSchema: {
+        buildingType: z.enum(BUILDING_TYPES).describe("Building type, as in place_building"),
+        variant: z
+          .string()
+          .regex(/^[a-z0-9_]+$/)
+          .optional()
+          .describe("Variant slug, e.g. 'snowy': saved as <type>__<variant>.png and used with place_building spriteVariant"),
+        material: z.string().optional().describe("Override of the building description"),
+        lighting: z.string().optional().describe("Override of the lighting description"),
+        extraDetail: z.string().optional().describe("Free text appended to the prompt"),
+        seed: z.number().int().optional().describe("Seed for reproducibility"),
+        force: z.boolean().optional().describe("Regenerate even if the sprite already exists (paid again)"),
+        dryRun: z.boolean().optional().describe("Return the prompt and target size without generating anything (free)"),
+      },
+      annotations: PAID,
+    },
+    async ({ buildingType, variant, material, lighting, extraDetail, seed, force, dryRun }) => {
+      const def = BUILDINGS[buildingType];
+      const rendered = buildBuildingPrompt(material ?? def.material, { lighting, extraDetail });
+      const relPath = buildingSpriteFile(buildingType, variant);
+      const size = `${def.imageWidth}x${def.imageHeight}`;
+      if (dryRun) return asText({ ok: true, dryRun: true, buildingType, file: relPath, size, prompt: rendered.prompt });
+      if (!hfToken()) return asText(missingToken());
+      const hosted = isHosted();
+      const outPath = hosted ? relPath : join(assetsRoot(), relPath);
+      if (spriteExists(relPath) && !force) {
+        return asText({
+          ok: false,
+          skipped: true,
+          outputPath: outPath,
+          error: "The sprite already exists; nothing was generated or billed. Pass force: true to regenerate it.",
+        });
+      }
+      const start = Date.now();
+      try {
+        const sharp = await loadSharp();
+        const { keyed, provider } = await fluxKeyed(sharp, rendered.prompt, rendered.dimensions, seed);
+        const buf = await fitBuilding(sharp, await isolateSubject(sharp, keyed), def.imageWidth, def.imageHeight);
+        const saved = await saveSprite(relPath, buf, outPath);
+        const result = asText({
+          ok: true,
+          buildingType,
+          variant: variant ?? null,
+          provider,
+          outputPath: saved,
+          finalSize: size,
+          relativePath: `${ASSET_PREFIX}${relPath}`,
+          bytes: buf.length,
+          durationMs: Date.now() - start,
+          promptUsed: rendered.prompt,
+        });
+        return hosted
+          ? { content: [...result.content, { type: "image" as const, data: buf.toString("base64"), mimeType: "image/png" }] }
+          : result;
+      } catch (err) {
+        return asText({ ok: false, error: err instanceof Error ? err.message : String(err), promptAttempted: rendered.prompt });
       }
     },
   );

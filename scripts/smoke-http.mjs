@@ -50,7 +50,10 @@ const fakeModel = createServer(async (req, res) => {
     () => call("generate_crypt_layout", { mapId }),
     () => call("save_to_disk", { mapId, path: "../../escape.tmj" }),
     () => call("place_spawn_enemy", { mapId, x: 22, y: 9, npcName: "Ghoul lord" }),
+    // A building inside the nave: its interior becomes a second, linked map.
+    () => call("place_building", { mapId, buildingType: "house", x: 11, y: 7, name: "Shrine" }),
     () => call("validate_map", { mapId }),
+    () => call("validate_world", { mapId }),
   ];
   const message = step < script.length ? script[step]() : { role: "assistant", content: "Smoke crypt is ready." };
   res.writeHead(200, { "Content-Type": "application/json" });
@@ -97,7 +100,7 @@ const data = (r) => { try { return JSON.parse(r.content?.[0]?.text ?? ""); } cat
 const a = await connect();
 const b = await connect();
 const tools = (await a.client.listTools()).tools;
-check("30 tools over HTTP", tools.length === 30, tools.length);
+check("35 tools over HTTP", tools.length === 35, tools.length);
 const created = data(await a.client.callTool({ name: "create_map", arguments: { name: "Session A", width: 28, height: 18, theme: "CRYPT" } }));
 const mapA = created.mapId;
 check("session A creates a map", typeof mapA === "string", created);
@@ -153,17 +156,24 @@ const events = (await run.text()).trim().split("\n").map((l) => JSON.parse(l));
 const done = events.find((e) => e.type === "done");
 const toolEvents = events.filter((e) => e.type === "tool");
 check("agent run streams NDJSON and finishes", run.headers.get("content-type")?.startsWith("application/x-ndjson") && !!done, events.filter((e) => e.type === "error"));
-check("agent ran the scripted tools", toolEvents.map((e) => e.name).join(",") === "create_map,generate_crypt_layout,save_to_disk,place_spawn_enemy,validate_map", toolEvents.map((e) => e.name));
+check("agent ran the scripted tools", toolEvents.map((e) => e.name).join(",") === "create_map,generate_crypt_layout,save_to_disk,place_spawn_enemy,place_building,validate_map,validate_world", toolEvents.map((e) => e.name));
 check("agent cannot call hidden tools", toolEvents.find((e) => e.name === "save_to_disk")?.ok === false);
-check("model only offered the web tool set", !seenTools.includes("save_to_disk") && !seenTools.includes("export_json") && !seenTools.includes("generate_tile_sprite") && seenTools.includes("create_map"), seenTools);
+check("agent placed a building with its interior", toolEvents.find((e) => e.name === "place_building")?.ok === true, toolEvents.find((e) => e.name === "place_building"));
+check("model only offered the web tool set", !seenTools.includes("save_to_disk") && !seenTools.includes("save_world") && !seenTools.includes("export_json") && !seenTools.includes("generate_tile_sprite") && !seenTools.includes("generate_building_sprite") && seenTools.includes("create_map") && seenTools.includes("place_building") && seenTools.includes("validate_world"), seenTools);
 check("every model call used the visitor's token, never the server's", seenAuth.size === 1 && seenAuth.has(`Bearer ${VISITOR_TOKEN}`), [...seenAuth]);
 if (done) {
   check("result has a PNG preview", done.previewPng.startsWith("data:image/png;base64,") && done.previewPng.length > 2000);
-  check("result map is the crypt with one enemy", done.map.name === "Smoke crypt" && done.map.spawns === 2, done.map);
+  check("result map is the crypt (player, enemy, arrival point)", done.map.name === "Smoke crypt" && done.map.spawns === 3 && done.map.buildings === 1, done.map);
+  check("result lists the main map then the interior", done.maps?.map((m) => m.fileName).join(",") === "smoke-crypt.tmj,shrine-interior.tmj", done.maps);
   check("result has no validation warnings", done.warnings.length === 0, done.warnings);
-  check("result reports usage and the final answer", done.usage.modelCalls === 6 && done.usage.promptTokens === 6000 && /ready/.test(done.report), done.usage);
+  check("result reports usage and the final answer", done.usage.modelCalls === 8 && done.usage.promptTokens === 8000 && /ready/.test(done.report), done.usage);
   const zip = unzipSync(new Uint8Array(await (await fetch(done.zipUrl)).arrayBuffer()));
-  check("result zip downloads", Object.keys(zip).includes("smoke-crypt/smoke-crypt.tmj"), Object.keys(zip));
+  const names = Object.keys(zip);
+  check("result zip holds both linked maps and the building sprite", ["smoke-crypt/smoke-crypt.tmj", "smoke-crypt/shrine-interior.tmj", "smoke-crypt/assets/buildings/house.png"].every((n) => names.includes(n)), names);
+  const mainTmj = JSON.parse(new TextDecoder().decode(zip["smoke-crypt/smoke-crypt.tmj"]));
+  const entrance = mainTmj.layers.find((l) => l.name === "objects").objects.find((o) => o.type === "entrance");
+  check("entrance in the zip points at the interior file next to it", entrance?.properties.some((p) => p.name === "targetMap" && p.value === "shrine-interior.tmj"), entrance);
+  check("bare .tmj link serves the main map", (await fetch(done.tmjUrl)).status === 200 && /smoke-crypt\.tmj$/.test(done.tmjUrl), done.tmjUrl);
 }
 
 const health = await (await fetch(`${base}/healthz`)).json();

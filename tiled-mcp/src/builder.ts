@@ -5,6 +5,7 @@
 
 import { randomUUID } from "node:crypto";
 import { currentScope, isHosted } from "./context.js";
+import { slugify, uniqueName } from "./names.js";
 import type {
   Theme,
   ThemeRole,
@@ -22,7 +23,33 @@ import type {
 
 export type MapId = string;
 
-export const MAX_MAP_SIZE = 64;
+/** Largest map side when TILED_MAX_MAP_SIZE is not set: 256 locally, 128 on a shared server. */
+export const DEFAULT_MAX_MAP_SIZE = 256;
+export const DEFAULT_HOSTED_MAX_MAP_SIZE = 128;
+const MAX_MAP_SIZE_CEILING = 1024;
+
+/** Largest allowed map side in cells (TILED_MAX_MAP_SIZE, 16..1024, overrides the default). */
+export function maxMapSize(): number {
+  const configured = Number(process.env.TILED_MAX_MAP_SIZE);
+  if (Number.isInteger(configured) && configured >= 16) return Math.min(configured, MAX_MAP_SIZE_CEILING);
+  return isHosted() ? DEFAULT_HOSTED_MAX_MAP_SIZE : DEFAULT_MAX_MAP_SIZE;
+}
+
+/**
+ * Links between maps are stored as "map:<mapId>" in 'file' properties while the maps live in
+ * memory, and written as the target's file name (e.g. "house-1.tmj") by serializeMap, so they
+ * resolve when the linked maps are saved side by side (save_world).
+ */
+const MAP_REF_PREFIX = "map:";
+
+export function mapRef(id: MapId): string {
+  return `${MAP_REF_PREFIX}${id}`;
+}
+
+/** mapId behind a stored link value, or undefined when the value is not a map link. */
+export function mapRefTarget(value: unknown): MapId | undefined {
+  return typeof value === "string" && value.startsWith(MAP_REF_PREFIX) ? value.slice(MAP_REF_PREFIX.length) : undefined;
+}
 
 export interface Occupant {
   name: string;
@@ -32,6 +59,8 @@ export interface Occupant {
 export interface BuilderState {
   id: MapId;
   name: string;
+  /** File name this map is written under by save_world and used by links pointing to it. */
+  fileName: string;
   width: number;
   height: number;
   tilewidth: number;
@@ -46,6 +75,14 @@ export interface BuilderState {
   decorations: TiledTileLayer;
   objects: TiledObjectGroup;
   spawns: TiledObjectGroup;
+  /** Building sprites as tile objects; created with the first building (layer id 6). */
+  buildings?: TiledObjectGroup;
+  /** Image-collection tileset of the building sprites, after the theme tileset. */
+  buildingTileset?: TiledTileset;
+  /** sprite file ("buildings/house.png") -> gid in buildingTileset */
+  buildingGids: Map<string, number>;
+  /** Extra map properties, e.g. buildingId and parentMap on an interior. */
+  properties: TiledProperty[];
   // "x,y" -> object or spawn standing on that cell
   occupied: Map<string, Occupant>;
   nextObjectId: number;
@@ -72,10 +109,9 @@ export interface CreateOptions {
 }
 
 export function createMap(opts: CreateOptions): { mapId: MapId; summary: MapSummary } {
-  if (opts.width < 1 || opts.width > MAX_MAP_SIZE || opts.height < 1 || opts.height > MAX_MAP_SIZE) {
-    throw new Error(
-      `Map size out of range: ${opts.width}x${opts.height} (allowed 1..${MAX_MAP_SIZE} per side).`,
-    );
+  const max = maxMapSize();
+  if (opts.width < 1 || opts.width > max || opts.height < 1 || opts.height > max) {
+    throw new Error(`Map size out of range: ${opts.width}x${opts.height} (allowed 1..${max} per side).`);
   }
   if (isHosted() && maps().size >= MAX_HOSTED_MAPS) {
     throw new Error(
@@ -152,9 +188,11 @@ export function createMap(opts: CreateOptions): { mapId: MapId; summary: MapSumm
     draworder: "topdown",
   });
 
+  const takenFiles = new Set(Array.from(maps().values(), (m) => m.fileName));
   const state: BuilderState = {
     id,
     name: opts.name,
+    fileName: `${uniqueName(slugify(opts.name), (c) => takenFiles.has(`${c}.tmj`))}.tmj`,
     width: opts.width,
     height: opts.height,
     tilewidth: theme.tilewidth,
@@ -168,6 +206,8 @@ export function createMap(opts: CreateOptions): { mapId: MapId; summary: MapSumm
     decorations: mkTileLayer(3, "decorations"),
     objects: mkObjectGroup(4, "objects"),
     spawns: mkObjectGroup(5, "spawns"),
+    buildingGids: new Map(),
+    properties: [],
     occupied: new Map(),
     nextObjectId: 1,
     createdAt: Date.now(),
@@ -180,6 +220,7 @@ export function createMap(opts: CreateOptions): { mapId: MapId; summary: MapSumm
 export interface MapSummary {
   mapId: MapId;
   name: string;
+  fileName: string;
   width: number;
   height: number;
   orientation: "isometric" | "orthogonal";
@@ -195,7 +236,15 @@ export interface MapSummary {
   };
   objects: number;
   spawns: number;
+  buildings: number;
+  /** Objects that lead to another map (entrances, exits, linked doors and stairs). */
+  transitions: number;
   createdAt: number;
+}
+
+/** True when the object leads to another map. */
+export function isTransition(obj: TiledObject): boolean {
+  return obj.properties?.some((p) => p.name === "targetMap") ?? false;
 }
 
 function summarize(state: BuilderState): MapSummary {
@@ -241,6 +290,7 @@ function summarize(state: BuilderState): MapSummary {
   return {
     mapId: state.id,
     name: state.name,
+    fileName: state.fileName,
     width: state.width,
     height: state.height,
     orientation: state.orientation,
@@ -248,8 +298,15 @@ function summarize(state: BuilderState): MapSummary {
     tileCount: counts,
     objects: state.objects.objects.length,
     spawns: state.spawns.objects.length,
+    buildings: state.buildings?.objects.length ?? 0,
+    transitions: state.objects.objects.filter(isTransition).length,
     createdAt: state.createdAt,
   };
+}
+
+/** Every map of the current caller's workspace (hosted: one MCP session). */
+export function allMaps(): BuilderState[] {
+  return Array.from(maps().values());
 }
 
 export function getMap(id: MapId): BuilderState {
@@ -288,7 +345,7 @@ export function gidForRole(state: BuilderState, role: ThemeRole): number {
 
 export type LayerName = "ground" | "walls" | "decorations";
 
-function assertInGrid(state: BuilderState, x: number, y: number, what = "Cell"): void {
+export function assertInGrid(state: BuilderState, x: number, y: number, what = "Cell"): void {
   if (x < 0 || x >= state.width || y < 0 || y >= state.height) {
     throw new Error(
       `${what} (${x}, ${y}) is outside the ${state.width}x${state.height} grid (valid x: 0..${state.width - 1}, y: 0..${state.height - 1}).`,
@@ -442,6 +499,8 @@ export interface PlaceObjectOptions {
   trapType?: string;
   trapNotation?: string;
   trapSaveDC?: number;
+  /** Extra properties written after the standard ones, e.g. targetMap and targetSpawn. */
+  properties?: TiledProperty[];
 }
 
 export function placeObject(id: MapId, opts: PlaceObjectOptions): number {
@@ -465,6 +524,7 @@ export function placeObject(id: MapId, opts: PlaceObjectOptions): number {
   if (opts.trapSaveDC !== undefined) {
     properties.push({ name: "trapSaveDC", value: opts.trapSaveDC, type: "int" });
   }
+  if (opts.properties) properties.push(...opts.properties);
   const name = opts.name ?? `${opts.kind}-${objectId}`;
   const obj: TiledObject = {
     id: objectId,
@@ -515,11 +575,108 @@ export function placeSpawn(id: MapId, opts: PlaceSpawnOptions): number {
   return objectId;
 }
 
+/** True when any object, spawn or building of the map already uses `name`. */
+export function objectNameTaken(state: BuilderState, name: string): boolean {
+  const groups = [state.objects, state.spawns, ...(state.buildings ? [state.buildings] : [])];
+  return groups.some((g) => g.objects.some((o) => o.name === name));
+}
+
+// ---------- Buildings ----------
+
+/**
+ * gid of a building sprite in this map's building tileset, adding the tileset (after the theme
+ * tileset) and the 'buildings' layer the first time. `file` is below the assets root,
+ * e.g. "buildings/house.png".
+ */
+export function buildingGid(
+  state: BuilderState,
+  file: string,
+  imageWidth: number,
+  imageHeight: number,
+  buildingType: string,
+): number {
+  const known = state.buildingGids.get(file);
+  if (known) return known;
+  if (!state.buildingTileset) {
+    state.buildingTileset = {
+      firstgid: state.tileset.firstgid + state.tileset.tilecount,
+      name: "buildings",
+      tilewidth: state.tilewidth,
+      tileheight: state.tileheight,
+      tilecount: 0,
+      columns: 0,
+      grid: { orientation: state.orientation, width: state.tilewidth, height: state.tileheight },
+      objectalignment: "bottom",
+      tiles: [],
+    };
+  }
+  if (!state.buildings) {
+    state.buildings = {
+      id: 6,
+      name: "buildings",
+      type: "objectgroup",
+      visible: true,
+      objects: [],
+      opacity: 1,
+      x: 0,
+      y: 0,
+      draworder: "topdown",
+    };
+  }
+  const ts = state.buildingTileset;
+  const localId = ts.tilecount;
+  ts.tiles!.push({
+    id: localId,
+    image: `./assets/${file}`,
+    imagewidth: imageWidth,
+    imageheight: imageHeight,
+    properties: [
+      { name: "tileType", value: "BUILDING", type: "string" },
+      { name: "buildingType", value: buildingType, type: "string" },
+    ],
+  });
+  ts.tilecount++;
+  const gid = ts.firstgid + localId;
+  state.buildingGids.set(file, gid);
+  return gid;
+}
+
+/**
+ * Position of a building tile object whose square footprint starts at cell (x, y) and spans
+ * `size` cells. The building tileset anchors images at their bottom centre, so the object sits
+ * on the footprint's bottom corner (isometric) or the middle of its bottom edge (orthogonal).
+ */
+export function buildingPlacement(state: BuilderState, x: number, y: number, size: number): { x: number; y: number } {
+  const tw = state.tilewidth;
+  const th = state.tileheight;
+  if (state.orientation === "orthogonal") return { x: (x + size / 2) * tw, y: (y + size) * th };
+  const col = x + size;
+  const row = y + size;
+  if (objectCoordMode() === "screen") return { x: (tw / 2) * (col - row), y: (th / 2) * (col + row) };
+  return { x: col * th, y: row * th };
+}
+
 // ---------- Serialization ----------
+
+/** Rewrite "map:<mapId>" link values as the target map's file name ("" if it was discarded). */
+function resolveMapRefs(objects: TiledObject[] | undefined, properties: TiledProperty[] | undefined): void {
+  const fix = (props: TiledProperty[] | undefined) => {
+    for (const p of props ?? []) {
+      const target = mapRefTarget(p.value);
+      if (target !== undefined) p.value = maps().get(target)?.fileName ?? "";
+    }
+  };
+  for (const o of objects ?? []) fix(o.properties);
+  fix(properties);
+}
 
 /** Returns a deep copy of the map as Tiled JSON, safe for callers to modify. */
 export function serializeMap(id: MapId): TiledMap {
   const state = getMap(id);
+  const tilesets = state.buildingTileset ? [state.tileset, state.buildingTileset] : [state.tileset];
+  const layers = state.buildings
+    ? [state.ground, state.walls, state.decorations, state.buildings, state.objects, state.spawns]
+    : [state.ground, state.walls, state.decorations, state.objects, state.spawns];
   const map: TiledMap = {
     type: "map",
     version: FORMAT_VERSION,
@@ -531,16 +688,22 @@ export function serializeMap(id: MapId): TiledMap {
     tilewidth: state.tilewidth,
     tileheight: state.tileheight,
     infinite: false,
-    nextlayerid: 6,
+    nextlayerid: state.buildings ? 7 : 6,
     nextobjectid: state.nextObjectId,
-    tilesets: [state.tileset],
-    layers: [state.ground, state.walls, state.decorations, state.objects, state.spawns],
+    tilesets,
+    layers,
     properties: [
       { name: "theme", value: state.theme.key, type: "string" },
       { name: "mapName", value: state.name, type: "string" },
+      ...state.properties,
     ],
   };
-  return structuredClone(map);
+  const copy = structuredClone(map);
+  for (const layer of copy.layers) {
+    if (layer.type === "objectgroup") resolveMapRefs(layer.objects, undefined);
+  }
+  resolveMapRefs(undefined, copy.properties);
+  return copy;
 }
 
 // ---------- Per-map sprite overrides & inspection ----------

@@ -19,14 +19,15 @@ throne for a castle laboratory.
 
 1. Create a Hugging Face account and an access token with permission to call Inference
    Providers: https://huggingface.co/settings/tokens
-2. Make sure the provider you use (default `replicate`) is enabled for your account and that
-   billing is set up.
+2. Make sure billing is set up. By default the server asks Hugging Face which providers serve
+   `black-forest-labs/FLUX.1-dev` right now and uses the first live one (fal-ai in November
+   2026; Replicate no longer serves it). The model page lists them under "Inference Providers".
 3. Put the token in `tiled-mcp/.env` or your MCP client's `env` block:
 
    ```
    HUGGINGFACE_API_KEY=hf_xxx
-   # optional: another provider that serves black-forest-labs/FLUX.1-dev
-   TILED_HF_PROVIDER=replicate
+   # optional: force one provider that serves black-forest-labs/FLUX.1-dev
+   TILED_HF_PROVIDER=fal-ai
    ```
 
 ## Generate a whole theme (recommended)
@@ -60,6 +61,28 @@ generate_tile_sprite(theme="CASTLE", role="obstacle_decor", variant="alembic",
 override_tile_image(mapId, role="obstacle_decor", variant="alembic")
   -> only this map uses the variant
 ```
+
+## Building sprites
+
+`place_building` draws houses, shops, taverns, temples, towers and castles with one large image
+each, `assets/buildings/<type>.png`, sized to the building's footprint (192x192 up to 384x384).
+They are generated the same way, one paid call per building:
+
+```bash
+node scripts/gen-building-sprites.mjs --dry-run   # free: prompts and sizes
+node scripts/gen-building-sprites.mjs --yes       # every missing building sprite
+node scripts/gen-building-sprites.mjs --clean     # free: re-cut the background of existing sprites
+```
+
+Providers do not always paint the clean magenta background the prompt asks for (fal-ai often
+returns pale pink or grey noise). Generation therefore isolates the building from whatever is
+left around it and refills windows the key erased. `--clean` runs the same cleanup on sprites
+already on disk, for example older ones or images you drew yourself.
+
+From an agent, `generate_building_sprite(buildingType, variant?, material?, extraDetail?)`
+does one; `dryRun: true` returns the prompt for free. The image is trimmed and fitted standing
+on its bottom edge, which is where the map anchors it. See
+[worlds-and-buildings.md](worlds-and-buildings.md).
 
 ## What the pipeline does
 

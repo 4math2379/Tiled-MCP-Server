@@ -1,10 +1,11 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { createMap, describeMap, discardMap, listMaps, MAX_MAP_SIZE } from "../builder.js";
+import { createMap, describeMap, discardMap, listMaps, maxMapSize } from "../builder.js";
 import { THEME_KEYS, describeThemes, getTheme } from "../themes/index.js";
 import { asText } from "./util.js";
 
 export function registerLifecycleTools(server: McpServer): void {
+  const max = maxMapSize();
   server.registerTool(
     "list_themes",
     {
@@ -22,11 +23,11 @@ export function registerLifecycleTools(server: McpServer): void {
     {
       title: "Create a map",
       description:
-        "Creates an empty isometric (default) or orthogonal Tiled map in the given theme and returns its mapId, which every other tool needs. The map has three tile layers (ground, walls, decorations) and two object layers (objects, spawns). Maps live in server memory until saved with save_to_disk or exported with export_json; they are lost when the server restarts.",
+        `Creates an empty isometric (default) or orthogonal Tiled map in the given theme and returns its mapId, which every other tool needs. Sides go up to ${max} cells, so one map can hold a whole village or region with buildings (place_building). The map has three tile layers (ground, walls, decorations) and two object layers (objects, spawns). Maps live in server memory until saved with save_to_disk or save_world, or exported with export_json; they are lost when the server restarts.`,
       inputSchema: {
         name: z.string().min(1).max(120).describe("Display name of the map, e.g. 'Crypt under the abandoned chapel'"),
-        width: z.number().int().min(4).max(MAX_MAP_SIZE).describe("Width in cells (1 cell = 5 ft in tabletop terms)"),
-        height: z.number().int().min(4).max(MAX_MAP_SIZE).describe("Height in cells"),
+        width: z.number().int().min(4).max(max).describe(`Width in cells, 4..${max} (1 cell = 5 ft in tabletop terms)`),
+        height: z.number().int().min(4).max(max).describe(`Height in cells, 4..${max}`),
         theme: z.enum(THEME_KEYS).describe("Theme key from list_themes, e.g. CRYPT"),
         orientation: z.enum(["isometric", "orthogonal"]).optional().describe("Defaults to isometric"),
       },

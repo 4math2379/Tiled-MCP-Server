@@ -1,0 +1,345 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "isometric",
+  "renderorder": "right-down",
+  "width": 12,
+  "height": 10,
+  "tilewidth": 64,
+  "tileheight": 32,
+  "infinite": false,
+  "nextlayerid": 6,
+  "nextobjectid": 3,
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "name": "crypt-tileset",
+      "tilewidth": 64,
+      "tileheight": 32,
+      "tilecount": 10,
+      "columns": 0,
+      "tiles": [
+        {
+          "id": 0,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALKABLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.flagstone",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/walkable_floor.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 1,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALKABLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.flagstone_cracked",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/walkable_floor_alt.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 2,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALL",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.wall_mossy",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/wall.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 3,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALL",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.wall_corner",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/wall_corner.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 4,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "DIFFICULT_TERRAIN",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.rubble",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/difficult_terrain.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 5,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "HAZARD",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.poison_vent",
+              "type": "string"
+            },
+            {
+              "name": "hazardType",
+              "value": "poison",
+              "type": "string"
+            },
+            {
+              "name": "hazardNotation",
+              "value": "2d6",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/hazard_primary.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 6,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "OBSTACLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.sarcophagus",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/obstacle_decor.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 7,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALKABLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.bones",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/decoration_minor.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 8,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "DOOR",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.iron_door",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/door_closed.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 9,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "STAIRS",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "crypt.stone_stairs",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/crypt/stairs.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        }
+      ],
+      "grid": {
+        "orientation": "isometric",
+        "width": 64,
+        "height": 32
+      }
+    }
+  ],
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "tilelayer",
+      "visible": true,
+      "width": 12,
+      "height": 10,
+      "data": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "walls",
+      "type": "tilelayer",
+      "visible": true,
+      "width": 12,
+      "height": 10,
+      "data": [3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3],
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "decorations",
+      "type": "tilelayer",
+      "visible": true,
+      "width": 12,
+      "height": 10,
+      "data": [0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 4,
+      "name": "objects",
+      "type": "objectgroup",
+      "visible": true,
+      "objects": [
+        {
+          "id": 1,
+          "x": 160,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "name": "cellar-stairs-back",
+          "type": "stairs",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "stairs",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "open",
+              "type": "string"
+            },
+            {
+              "name": "targetMap",
+              "value": "greystone-keep-interior.tmj",
+              "type": "file"
+            },
+            {
+              "name": "targetSpawn",
+              "value": "cellar-stairs-arrival",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "opacity": 1,
+      "x": 0,
+      "y": 0,
+      "draworder": "topdown"
+    },
+    {
+      "id": 5,
+      "name": "spawns",
+      "type": "objectgroup",
+      "visible": true,
+      "objects": [
+        {
+          "id": 2,
+          "x": 176,
+          "y": 176,
+          "point": true,
+          "name": "cellar-stairs-back-arrival",
+          "type": "arrival",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "role",
+              "value": "arrival",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "opacity": 1,
+      "x": 0,
+      "y": 0,
+      "draworder": "topdown"
+    }
+  ],
+  "properties": [
+    {
+      "name": "theme",
+      "value": "CRYPT",
+      "type": "string"
+    },
+    {
+      "name": "mapName",
+      "value": "Keep cellar",
+      "type": "string"
+    }
+  ]
+}

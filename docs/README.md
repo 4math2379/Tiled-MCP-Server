@@ -6,6 +6,7 @@
 | [hugging-face.md](hugging-face.md) | The hosted web page and remote MCP endpoint on Hugging Face: costs, sign-in, Docker, updating the Space |
 | [tools.md](tools.md) | Every tool and its parameters (generated from the server) |
 | [map-format.md](map-format.md) | Layers, tile and object properties, coordinates, formulas for importers |
+| [worlds-and-buildings.md](worlds-and-buildings.md) | Large outdoor maps with buildings you can enter, linked maps, loading them in Godot 4 |
 | [themes.md](themes.md) | The 20 themes, their roles and sprite availability (generated) |
 | [configuration.md](configuration.md) | Environment variables, `.env`, hosted mode, paths, secrets |
 | [sprite-generation.md](sprite-generation.md) | Optional paid sprite generation with FLUX.1-dev |

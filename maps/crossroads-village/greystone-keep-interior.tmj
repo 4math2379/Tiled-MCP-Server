@@ -1,0 +1,588 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "isometric",
+  "renderorder": "right-down",
+  "width": 27,
+  "height": 20,
+  "tilewidth": 64,
+  "tileheight": 32,
+  "infinite": false,
+  "nextlayerid": 6,
+  "nextobjectid": 14,
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "name": "castle-tileset",
+      "tilewidth": 64,
+      "tileheight": 32,
+      "tilecount": 9,
+      "columns": 0,
+      "tiles": [
+        {
+          "id": 0,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALKABLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.black_marble",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/walkable_floor.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 1,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALKABLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.red_carpet",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/walkable_floor_alt.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 2,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALL",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.basalt_wall",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/wall.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 3,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALL",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.basalt_corner",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/wall_corner.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 4,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "DIFFICULT_TERRAIN",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.debris",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/difficult_terrain.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 5,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "OBSTACLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.throne",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/obstacle_decor.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 6,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "WALKABLE",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.banner",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/decoration_minor.png",
+          "imagewidth": 64,
+          "imageheight": 32
+        },
+        {
+          "id": 7,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "DOOR",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.oak_door",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/door_closed.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        },
+        {
+          "id": 8,
+          "properties": [
+            {
+              "name": "tileType",
+              "value": "STAIRS",
+              "type": "string"
+            },
+            {
+              "name": "spriteId",
+              "value": "castle.grand_stairs",
+              "type": "string"
+            }
+          ],
+          "image": "../../assets/castle/stairs.png",
+          "imagewidth": 64,
+          "imageheight": 64
+        }
+      ],
+      "grid": {
+        "orientation": "isometric",
+        "width": 64,
+        "height": 32
+      }
+    }
+  ],
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "tilelayer",
+      "visible": true,
+      "width": 27,
+      "height": 20,
+      "data": [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "walls",
+      "type": "tilelayer",
+      "visible": true,
+      "width": 27,
+      "height": 20,
+      "data": [0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,3,3,3,3,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,0,0,3,0,0,0,0,0,0,0,0,3,0,3,3,3,3,3,3,3,0,3,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,3,0,3,0,0,0,0,0,3,0,3,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,3,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,3,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,3,0,3,0,0,0,0,0,3,0,3,3,3,3,3,3,0,0,3,0,0,0,0,0,0,0,0,3,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,3,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0],
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "decorations",
+      "type": "tilelayer",
+      "visible": true,
+      "width": 27,
+      "height": 20,
+      "data": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 4,
+      "name": "objects",
+      "type": "objectgroup",
+      "visible": true,
+      "objects": [
+        {
+          "id": 1,
+          "x": 160,
+          "y": 320,
+          "width": 32,
+          "height": 32,
+          "name": "door-1",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "x": 256,
+          "y": 320,
+          "width": 32,
+          "height": 32,
+          "name": "door-2",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "x": 416,
+          "y": 192,
+          "width": 32,
+          "height": 32,
+          "name": "door-3",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "x": 416,
+          "y": 448,
+          "width": 32,
+          "height": 32,
+          "name": "door-4",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "x": 544,
+          "y": 320,
+          "width": 32,
+          "height": 32,
+          "name": "door-5",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "x": 416,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "name": "door-6",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "x": 416,
+          "y": 480,
+          "width": 32,
+          "height": 32,
+          "name": "door-7",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "x": 608,
+          "y": 320,
+          "width": 32,
+          "height": 32,
+          "name": "door-8",
+          "type": "door",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "door",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "x": 0,
+          "y": 320,
+          "width": 32,
+          "height": 32,
+          "name": "greystone-keep-exit",
+          "type": "exit",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "exit",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "closed",
+              "type": "string"
+            },
+            {
+              "name": "targetMap",
+              "value": "crossroads-village.tmj",
+              "type": "file"
+            },
+            {
+              "name": "targetSpawn",
+              "value": "greystone-keep-outside",
+              "type": "string"
+            },
+            {
+              "name": "buildingId",
+              "value": "greystone-keep",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "x": 384,
+          "y": 256,
+          "width": 32,
+          "height": 32,
+          "name": "cellar-stairs",
+          "type": "stairs",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "kind",
+              "value": "stairs",
+              "type": "string"
+            },
+            {
+              "name": "state",
+              "value": "open",
+              "type": "string"
+            },
+            {
+              "name": "targetMap",
+              "value": "keep-cellar.tmj",
+              "type": "file"
+            },
+            {
+              "name": "targetSpawn",
+              "value": "cellar-stairs-back-arrival",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "opacity": 1,
+      "x": 0,
+      "y": 0,
+      "draworder": "topdown"
+    },
+    {
+      "id": 5,
+      "name": "spawns",
+      "type": "objectgroup",
+      "visible": true,
+      "objects": [
+        {
+          "id": 9,
+          "x": 720,
+          "y": 272,
+          "point": true,
+          "name": "enemy-9",
+          "type": "enemy",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "role",
+              "value": "enemy",
+              "type": "string"
+            },
+            {
+              "name": "npcName",
+              "value": "Castle lord",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "x": 48,
+          "y": 336,
+          "point": true,
+          "name": "greystone-keep-inside",
+          "type": "arrival",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "role",
+              "value": "arrival",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "x": 400,
+          "y": 304,
+          "point": true,
+          "name": "cellar-stairs-arrival",
+          "type": "arrival",
+          "visible": true,
+          "rotation": 0,
+          "properties": [
+            {
+              "name": "role",
+              "value": "arrival",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "opacity": 1,
+      "x": 0,
+      "y": 0,
+      "draworder": "topdown"
+    }
+  ],
+  "properties": [
+    {
+      "name": "theme",
+      "value": "CASTLE",
+      "type": "string"
+    },
+    {
+      "name": "mapName",
+      "value": "Greystone keep interior",
+      "type": "string"
+    },
+    {
+      "name": "buildingId",
+      "value": "greystone-keep",
+      "type": "string"
+    },
+    {
+      "name": "parentMap",
+      "value": "crossroads-village.tmj",
+      "type": "file"
+    }
+  ]
+}

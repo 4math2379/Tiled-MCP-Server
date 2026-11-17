@@ -62,7 +62,9 @@ Structured (recommended for complex maps):
 
 - **Theme**: infer it from the vocabulary (table below). When unsure, call `list_themes` and
   propose two options.
-- **Size**: default 20x15 for a custom layout, minimum 12x10, maximum 64x64. Presets need at
+- **Size**: default 20x15 for a custom layout, minimum 12x10. The maximum is the one
+  `create_map` states (256x256 by default, 128x128 on the hosted server); above 64x64, build
+  with rooms, presets, `paint_rect` and buildings rather than cell by cell. Presets need at
   least: crypt 27x18, castle 27x20, werewolf den 22x16.
 - **Mood**: combat means an open map, infiltration means narrow corridors, a narrative scene
   means a small map with NPCs.
@@ -167,6 +169,27 @@ Placement rules the server enforces (a failing call explains why):
   `erase_tile(layer="walls")` first.
 - Corridors are straight; chain two corridors for an L shape.
 
+#### Outdoor maps with buildings you can enter
+
+When `place_building` is available and the request is a village, town, region or anything
+with houses, a tavern, a temple, a tower or a castle the player should walk into:
+
+```text
+1. create_map(outdoor theme, e.g. VILLAGE, up to the size limit) -> mapId
+2. paint_rect(layer=ground) over the whole map, then roads and props
+3. place_building(mapId, buildingType, x, y, name) per building: the footprint
+   (house and shop 3x3, tavern and temple 4x4, tower 2x2, castle 6x6) must be free ground;
+   it creates the interior map and links both ways. Keep the cell in front of the door free.
+4. Optional: edit an interior with the usual tools (its mapId is in the result), and join
+   extra levels with link_maps(kind="stairs"), e.g. a castle cellar or a tower top.
+5. place_spawn_player on the outdoor map only; interiors start on their arrival points.
+6. validate_map on each map, then validate_world(mapId): fix every error.
+7. save_world(mapId): writes every linked map side by side (the links use those file names).
+```
+
+Building sprites are large images made with `generate_building_sprite` (paid, ask first, as
+in Step 4); until they exist Tiled shows placeholders and the map still works.
+
 ### Step 6: report
 
 ```markdown
@@ -226,7 +249,7 @@ Placement rules the server enforces (a failing call explains why):
 - Skip `validate_map` before saving.
 - Leave the map without a player spawn.
 - Invent a theme: use only the keys returned by `list_themes`.
-- Exceed 64x64, or run a preset below its minimum size.
+- Exceed the size limit `create_map` states, or run a preset below its minimum size.
 - Generate paid sprites without the user's explicit agreement.
 - Copy published map layouts or text verbatim.
 - Use emojis in map, room or object names.

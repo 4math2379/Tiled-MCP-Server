@@ -10,14 +10,21 @@ export type TileType =
   | "OBSTACLE"
   | "STAIRS";
 
-export type ObjectKind = "door" | "chest" | "stairs" | "lever" | "trap";
+/**
+ * Object kinds on the 'objects' layer. 'entrance' and 'exit' are map transitions written by
+ * place_building; door and stairs objects become transitions too when link_maps gives them a
+ * targetMap. 'building' objects live on the 'buildings' layer.
+ */
+export type ObjectKind = "door" | "chest" | "stairs" | "lever" | "trap" | "entrance" | "exit" | "building";
 export type ObjectState = "closed" | "open" | "locked" | "triggered";
-export type SpawnRole = "player" | "enemy" | "npc";
+/** 'arrival' marks where a player lands when coming through a map transition. */
+export type SpawnRole = "player" | "enemy" | "npc" | "arrival";
 
 export interface TiledProperty {
   name: string;
   value: string | number | boolean;
-  type?: "string" | "int" | "float" | "bool";
+  /** 'file' holds a path relative to the map file (Tiled opens it on right-click). */
+  type?: "string" | "int" | "float" | "bool" | "file";
 }
 
 export interface TiledTilesetTile {
@@ -37,6 +44,8 @@ export interface TiledTileset {
   columns: number;
   tiles?: TiledTilesetTile[];
   grid?: { orientation: "isometric" | "orthogonal"; width: number; height: number };
+  /** Anchor of tile objects using this tileset; the building tileset uses "bottom". */
+  objectalignment?: "unspecified" | "bottom";
 }
 
 export interface TiledTileLayer {

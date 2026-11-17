@@ -11,7 +11,10 @@ Run them from the repository root after `npm install && npm run build`.
 | `create-aquatic-map.mjs` | `npm run examples` | free | Rebuilds `maps/caverne-aquatique.tmj` with the builder API. |
 | `create-glacier-map.mjs` | `npm run examples` | free | Rebuilds `maps/forteresse-glace-etage.tmj`. |
 | `create-electronic-hacker-map.mjs` | `npm run examples` | free | Rebuilds `maps/reseau-electronique-repaire-hacker.tmj`. |
+| `create-village-world.mjs` | `npm run examples` | free | Rebuilds the sample world `maps/crossroads-village/`: an outdoor map, six buildings and their linked interiors. |
 | `gen-theme-set.mjs` | | **paid** | Generates a theme's missing sprites with FLUX.1-dev. Needs `--yes`; try `--dry-run` first. See [docs/sprite-generation.md](../docs/sprite-generation.md). |
+| `gen-building-sprites.mjs` | | **paid** (`--clean` free) | Generates missing building sprites with FLUX.1-dev (`--yes`, try `--dry-run` first); `--clean` removes leftover background from existing ones. |
 
-The three `create-*` scripts show how to build maps from code without an MCP client: they import
-`tiled-mcp/dist/builder.js` and `tiled-mcp/dist/tmj.js` directly.
+The `create-*` scripts show how to build maps from code without an MCP client: they import
+`tiled-mcp/dist/builder.js` and `tiled-mcp/dist/tmj.js` directly, and the world script
+`tiled-mcp/dist/world.js` too.
