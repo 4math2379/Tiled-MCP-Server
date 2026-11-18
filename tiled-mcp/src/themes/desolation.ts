@@ -6,9 +6,9 @@ const D = "./assets/desolation";
 
 export const DESOLATION: Theme = {
   key: "DESOLATION",
-  name: "Terre Desolee",
+  name: "Desolate Land",
   description:
-    "Cendres froides, arbres carbonisés, sols stériles, ciel gris. Paysage post-cataclysmique, ruines calcinées, ossuaires à ciel ouvert.",
+    "Cold ash, charred trees, barren ground, grey sky. Post-cataclysm landscape, burnt ruins, open-air ossuaries.",
   tilesetName: "desolation-tileset",
   tilewidth: 64,
   tileheight: 32,

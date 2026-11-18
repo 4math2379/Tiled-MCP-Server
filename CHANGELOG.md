@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.5.0
+
+Everything is in English: theme keys, names and descriptions, sprite folders and example maps.
+
+### Changed
+
+- Ten theme keys were French and are now English: `GLACIAIRE` -> `GLACIER`, `INONDE` -> `FLOODED`,
+  `VOLCAN` -> `VOLCANO`, `FORET` -> `DARK_FOREST`, `HIVER` -> `WINTER`, `PRINTEMPS` -> `SPRING`,
+  `ETE` -> `SUMMER`, `AUTOMNE` -> `AUTUMN`, `FUTURISTE` -> `FUTURISTIC`, `ELECTRONIQUE` -> `ELECTRONIC`.
+  The MCP tools list only the English keys and answer an old key with its replacement
+  ("Theme 'GLACIAIRE' was renamed 'GLACIER'"); `getTheme()` in the builder API and the web API
+  still accept the old keys.
+- Every theme has an English display name and description (for example "Mournevald Crypt",
+  "Werewolf Den", "Frozen Tundra").
+- Sprite folders, sprite ids and tileset names follow the new keys (`assets/glacier/`,
+  `assets/flooded/`, `assets/electronic/`, ...). A map saved before 0.5.0 with one of the renamed
+  themes points at the old folder: save it again, or rename the folder in its tileset paths.
+- Example maps have English file names and contents: `water-cavern.tmj`, `ice-fortress.tmj`,
+  `hacker-lair.tmj` and `nemotron-crypt-example.tmj`.
+
+### Added
+
+- `npm test` runs every offline suite once; `npm run test:loop` runs them 5 times in a row.
+- The smoke test loops over all 20 themes: English key, name and description, each layout preset
+  builds a map the player can walk with no warning, and a saved map finds its sprites.
+
 ## 0.4.1
 
 Walking reachability: a map can load correctly and still not be explorable. Suggested in

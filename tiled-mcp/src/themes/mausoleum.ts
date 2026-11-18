@@ -6,9 +6,9 @@ const A = "./assets/mausoleum";
 
 export const MAUSOLEUM: Theme = {
   key: "MAUSOLEUM",
-  name: "Mausolée",
+  name: "Mausoleum",
   description:
-    "Marbre veiné de gris, statues d'anges déchus aux ailes brisées, urnes funéraires alignées dans les niches, chuchotements à la limite de l'audible.",
+    "Grey-veined marble, statues of fallen angels with broken wings, funeral urns lined up in niches, whispers at the edge of hearing.",
   tilesetName: "mausoleum-tileset",
   tilewidth: 64,
   tileheight: 32,

@@ -8,8 +8,8 @@
 
 ## When you need it
 
-12 of the 20 themes ship with sprites in `assets/`. The other 8 (`VOLCAN`, `FORET`, `HIVER`,
-`PRINTEMPS`, `ETE`, `AUTOMNE`, `DESOLATION`, `FUTURISTE`) produce valid maps, but Tiled shows
+12 of the 20 themes ship with sprites in `assets/`. The other 8 (`VOLCANO`, `DARK_FOREST`, `WINTER`,
+`SPRING`, `SUMMER`, `AUTUMN`, `DESOLATION`, `FUTURISTIC`) produce valid maps, but Tiled shows
 placeholders until their PNGs exist. `list_themes` reports the status of every theme.
 
 You also need generation for **contextual variants**, such as an alembic instead of the default
@@ -37,8 +37,8 @@ wait for a single tool call. Use the script:
 
 ```bash
 npm run build
-node scripts/gen-theme-set.mjs VOLCAN --dry-run     # free: lists the sprites it would generate
-node scripts/gen-theme-set.mjs VOLCAN --yes         # paid
+node scripts/gen-theme-set.mjs VOLCANO --dry-run     # free: lists the sprites it would generate
+node scripts/gen-theme-set.mjs VOLCANO --yes         # paid
 node scripts/gen-theme-set.mjs --missing --dry-run  # every theme that lacks sprites
 ```
 

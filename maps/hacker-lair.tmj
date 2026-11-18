@@ -14,7 +14,7 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "name": "electronique-tileset",
+      "name": "electronic-tileset",
       "tilewidth": 64,
       "tileheight": 32,
       "tilecount": 10,
@@ -30,11 +30,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.pcb_trace",
+              "value": "electronic.pcb_trace",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/walkable_floor.png",
+          "image": "../assets/electronic/walkable_floor.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -48,11 +48,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.chip_substrate",
+              "value": "electronic.chip_substrate",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/walkable_floor_alt.png",
+          "image": "../assets/electronic/walkable_floor_alt.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -66,11 +66,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.server_casing",
+              "value": "electronic.server_casing",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/wall.png",
+          "image": "../assets/electronic/wall.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -84,11 +84,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.circuit_corner",
+              "value": "electronic.circuit_corner",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/wall_corner.png",
+          "image": "../assets/electronic/wall_corner.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -102,11 +102,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.tangled_cable",
+              "value": "electronic.tangled_cable",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/difficult_terrain.png",
+          "image": "../assets/electronic/difficult_terrain.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -120,11 +120,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.power_surge",
+              "value": "electronic.power_surge",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/hazard_primary.png",
+          "image": "../assets/electronic/hazard_primary.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -138,11 +138,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.mainframe_core",
+              "value": "electronic.mainframe_core",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/obstacle_decor.png",
+          "image": "../assets/electronic/obstacle_decor.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -156,11 +156,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.blinking_led",
+              "value": "electronic.blinking_led",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/decoration_minor.png",
+          "image": "../assets/electronic/decoration_minor.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -174,11 +174,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.biometric_door",
+              "value": "electronic.biometric_door",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/door_closed.png",
+          "image": "../assets/electronic/door_closed.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -192,11 +192,11 @@
             },
             {
               "name": "spriteId",
-              "value": "electronique.access_ladder",
+              "value": "electronic.access_ladder",
               "type": "string"
             }
           ],
-          "image": "../assets/electronique/stairs.png",
+          "image": "../assets/electronic/stairs.png",
           "imagewidth": 64,
           "imageheight": 64
         }
@@ -257,7 +257,7 @@
           "y": 1856,
           "width": 32,
           "height": 32,
-          "name": "coffre-donnees-hacker",
+          "name": "hacker-data-chest",
           "type": "chest",
           "visible": true,
           "rotation": 0,
@@ -320,7 +320,7 @@
             },
             {
               "name": "npcName",
-              "value": "Hacker-reseau",
+              "value": "Network Hacker",
               "type": "string"
             }
           ]
@@ -342,7 +342,7 @@
             },
             {
               "name": "npcName",
-              "value": "Hacker-reseau",
+              "value": "Network Hacker",
               "type": "string"
             }
           ]
@@ -364,7 +364,7 @@
             },
             {
               "name": "npcName",
-              "value": "Hacker-reseau",
+              "value": "Network Hacker",
               "type": "string"
             }
           ]
@@ -374,7 +374,7 @@
           "x": 784,
           "y": 1776,
           "point": true,
-          "name": "securite-1",
+          "name": "security-1",
           "type": "enemy",
           "visible": true,
           "rotation": 0,
@@ -386,7 +386,7 @@
             },
             {
               "name": "npcName",
-              "value": "Securite-numerique",
+              "value": "Security Daemon",
               "type": "string"
             }
           ]
@@ -408,7 +408,7 @@
             },
             {
               "name": "npcName",
-              "value": "IA-rogue",
+              "value": "Rogue AI",
               "type": "string"
             }
           ]
@@ -423,12 +423,12 @@
   "properties": [
     {
       "name": "theme",
-      "value": "ELECTRONIQUE",
+      "value": "ELECTRONIC",
       "type": "string"
     },
     {
       "name": "mapName",
-      "value": "Reseau Electronique - Repaire Hacker",
+      "value": "Electronic Network - Hacker Lair",
       "type": "string"
     }
   ]

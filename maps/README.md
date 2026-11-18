@@ -3,15 +3,15 @@
 Open any of these in [Tiled](https://www.mapeditor.org) (File, Open) or render a PNG preview:
 
 ```bash
-npm run preview -- maps/forteresse-glace-etage.tmj
+npm run preview -- maps/ice-fortress.tmj
 ```
 
 | File | Theme | Size | How it was made |
 |---|---|---|---|
-| `exemple-crypte-nemotron.tmj` | `CRYPT` | 20x14 | Built by a Nemotron agent through the MCP tools with an early version of the server. The crypt preset ran on a map smaller than it needs, so some rooms overlap and two doors share a cell; current versions refuse that size (the crypt preset needs 27x18). A prop behind the north door also seals the north room, which `validate_map`'s walking check now reports. Kept as a real agent-made example. |
-| `caverne-aquatique.tmj` | `AQUATIC` | 64x64 | `scripts/create-aquatic-map.mjs` |
-| `forteresse-glace-etage.tmj` | `GLACIAIRE` | 64x64 | `scripts/create-glacier-map.mjs` |
-| `reseau-electronique-repaire-hacker.tmj` | `ELECTRONIQUE` | 64x64 | `scripts/create-electronic-hacker-map.mjs` |
+| `nemotron-crypt-example.tmj` | `CRYPT` | 20x14 | Built by a Nemotron agent through the MCP tools with an early version of the server. The crypt preset ran on a map smaller than it needs, so some rooms overlap and two doors share a cell; current versions refuse that size (the crypt preset needs 27x18). A prop behind the north door also seals the north room, which `validate_map`'s walking check now reports. Kept as a real agent-made example; its names were translated to English. |
+| `water-cavern.tmj` | `AQUATIC` | 64x64 | `scripts/create-aquatic-map.mjs` |
+| `ice-fortress.tmj` | `GLACIER` | 64x64 | `scripts/create-glacier-map.mjs` |
+| `hacker-lair.tmj` | `ELECTRONIC` | 64x64 | `scripts/create-electronic-hacker-map.mjs` |
 | `crossroads-village/` | `VILLAGE` and interiors | 40x40 + 7 maps | `scripts/create-village-world.mjs` |
 
 `crossroads-village/` is a sample **world**: an outdoor map with six buildings you can enter

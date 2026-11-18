@@ -6,9 +6,9 @@ const A = "./assets/werewolf_den";
 
 export const WEREWOLF_DEN: Theme = {
   key: "WEREWOLF_DEN",
-  name: "Tanière de loups-garous",
+  name: "Werewolf Den",
   description:
-    "Cavernes humides creusées dans la forêt de Drakenmark, sol en terre battue jonché d'ossements, parois rocheuses entaillées par les griffes, mares de sang frénétique près des proies récentes.",
+    "Damp caves dug into the Drakenmark forest, packed-earth floor strewn with bones, rock walls scored by claws, pools of blood near fresh prey.",
   tilesetName: "werewolf-den-tileset",
   tilewidth: 64,
   tileheight: 32,

@@ -25,7 +25,7 @@ import { loadEnvFile } from "./env.js";
 import { PACKAGE_ROOT } from "./paths.js";
 import { createServer, SERVER_VERSION } from "./server.js";
 import { assetFile } from "./sprites.js";
-import { THEME_KEYS, describeThemes } from "./themes/index.js";
+import { THEME_KEYS, describeThemes, resolveThemeKey } from "./themes/index.js";
 
 setHostedMode(true);
 loadEnvFile();
@@ -191,7 +191,7 @@ async function handleGenerate(req: IncomingMessage, res: ServerResponse): Promis
   if (description.length > MAX_DESCRIPTION) {
     return json(res, 400, { error: `The description is too long (${description.length} characters, at most ${MAX_DESCRIPTION}).` });
   }
-  const theme = typeof body.theme === "string" && body.theme ? body.theme : undefined;
+  const theme = typeof body.theme === "string" && body.theme ? resolveThemeKey(body.theme) : undefined;
   if (theme && !THEME_KEYS.includes(theme)) return json(res, 400, { error: `Unknown theme '${theme}'.` });
   const model = typeof body.model === "string" && body.model.trim() ? body.model.trim() : DEFAULT_MODEL;
   if (!MODEL_ID.test(model)) return json(res, 400, { error: `'${model}' is not a model id such as openai/gpt-oss-120b.` });

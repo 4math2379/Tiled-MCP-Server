@@ -10,7 +10,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { buildBuildingPrompt, buildPrompt, NEGATIVE_PROMPT, type ThemeKey } from "../themes/prompts.js";
 import { BUILDINGS, BUILDING_TYPES, buildingSpriteFile } from "../buildings.js";
-import { THEME_KEYS, themeAssetDir } from "../themes/index.js";
+import { themeAssetDir, themeKeySchema } from "../themes/index.js";
 import { THEME_ROLES } from "../types.js";
 import { getMap, overrideTileImage } from "../builder.js";
 import { assetsRoot, resolveUserPath } from "../paths.js";
@@ -348,7 +348,7 @@ async function fitBuilding(sharp: Sharp, buf: Buffer, width: number, height: num
     .toBuffer();
 }
 
-const THEME = z.enum(THEME_KEYS).describe("Theme key from list_themes");
+const THEME = themeKeySchema().describe("Theme key from list_themes");
 const ROLE = z.enum(THEME_ROLES).describe("Tile role, e.g. walkable_floor, wall, obstacle_decor");
 const PAID = { readOnlyHint: false, destructiveHint: false, openWorldHint: true } as const;
 

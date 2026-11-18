@@ -113,7 +113,7 @@ git clone https://github.com/4math2379/Tiled-MCP-Server.git
 cd Tiled-MCP-Server
 npm install        # installs the server workspace
 npm run build      # compiles tiled-mcp/src to tiled-mcp/dist
-npm run smoke      # optional: 38 offline end-to-end checks
+npm test           # optional: every offline test suite (96 + 96 + 39 checks)
 ```
 
 Then register the server with your MCP client. With **Claude Code**, from the repository folder:
@@ -186,26 +186,26 @@ Full parameters, generated from the server itself: **[docs/tools.md](docs/tools.
 
 | Theme key | Display name | Setting | Sprites |
 |---|---|---|---|
-| `CRYPT` | Crypte mournevaldienne | Burial vaults, cracked flagstones, poison vents | ✅ |
-| `CASTLE` | Castel Von Drak | Black marble halls, throne room, grand stairs | ✅ |
-| `WEREWOLF_DEN` | Tanière de loups-garous | Damp caves, bones, blood pools | ✅ |
-| `TAVERN_BLOOD_PRINCE` | Auberge du Prince Sanglant | Tavern interior, oak tables, hearth | ✅ |
-| `VILLAGE` | Village mournevaldien | Wet cobblestones, half-timbered houses, well | ✅ |
-| `HAUNTED_FOREST` | Forêt de Drakenmark | Dark undergrowth, brambles, parasitic mist | ✅ |
-| `MAUSOLEUM` | Mausolée | Veined marble, fallen-angel statues, urns | ✅ |
-| `BLOOD_TOMB` | Tombeau de sang | Ritual sanctuary, bleeding runes, altar | ✅ |
-| `AQUATIC` | Eaux Croupies | Stagnant water, water lilies, sunken ruins | ✅ |
-| `GLACIAIRE` | Toundra Glacée | Black ice, frozen statues, thin ice | ✅ |
-| `INONDE` | Cote Inondee | Drowned city, kelp, deep currents | ✅ |
-| `ELECTRONIQUE` | Reseau Electronique | Circuit boards, cables, mainframe cores | ✅ |
-| `VOLCAN` | Pente Volcanique | Lava flows, obsidian, ash | ➖ |
-| `FORET` | Foret Sombre | Twisted woods, quicksand, standing stones | ➖ |
-| `HIVER` | Plaine Enneigee | Snowfields, frozen lakes, cairns | ➖ |
-| `PRINTEMPS` | Prairie Printaniere | Flowering meadows, streams, maypole | ➖ |
-| `ETE` | Plaine Estivale | Golden wheat, cracked earth, scarecrows | ➖ |
-| `AUTOMNE` | Foret d'Automne | Russet leaves, bog mire, mushrooms | ➖ |
-| `DESOLATION` | Terre Desolee | Ash pits, charred trees, ruins | ➖ |
-| `FUTURISTE` | Cite Futuriste | Chrome, neon, plasma leaks, server racks | ➖ |
+| `CRYPT` | Mournevald Crypt | Burial vaults, cracked flagstones, poison vents | ✅ |
+| `CASTLE` | Castle Von Drak | Black marble halls, throne room, grand stairs | ✅ |
+| `WEREWOLF_DEN` | Werewolf Den | Damp caves, bones, blood pools | ✅ |
+| `TAVERN_BLOOD_PRINCE` | Blood Prince Inn | Tavern interior, oak tables, hearth | ✅ |
+| `VILLAGE` | Mournevald Village | Wet cobblestones, half-timbered houses, well | ✅ |
+| `HAUNTED_FOREST` | Drakenmark Forest | Dark undergrowth, brambles, parasitic mist | ✅ |
+| `MAUSOLEUM` | Mausoleum | Veined marble, fallen-angel statues, urns | ✅ |
+| `BLOOD_TOMB` | Blood Tomb | Ritual sanctuary, bleeding runes, altar | ✅ |
+| `AQUATIC` | Stagnant Waters | Stagnant water, water lilies, sunken ruins | ✅ |
+| `GLACIER` | Frozen Tundra | Black ice, frozen statues, thin ice | ✅ |
+| `FLOODED` | Flooded Coast | Drowned city, kelp, deep currents | ✅ |
+| `ELECTRONIC` | Electronic Network | Circuit boards, cables, mainframe cores | ✅ |
+| `VOLCANO` | Volcanic Slope | Lava flows, obsidian, ash | ➖ |
+| `DARK_FOREST` | Dark Forest | Twisted woods, quicksand, standing stones | ➖ |
+| `WINTER` | Snowy Plain | Snowfields, frozen lakes, cairns | ➖ |
+| `SPRING` | Spring Meadow | Flowering meadows, streams, maypole | ➖ |
+| `SUMMER` | Summer Plain | Golden wheat, cracked earth, scarecrows | ➖ |
+| `AUTUMN` | Autumn Forest | Russet leaves, bog mire, mushrooms | ➖ |
+| `DESOLATION` | Desolate Land | Ash pits, charred trees, ruins | ➖ |
+| `FUTURISTIC` | Futuristic City | Chrome, neon, plasma leaks, server racks | ➖ |
 
 ✅ sprites bundled in `assets/` · ➖ no sprites yet: the maps are valid and Tiled shows placeholders until you [generate the sprites](docs/sprite-generation.md).
 
@@ -217,8 +217,8 @@ Full parameters, generated from the server itself: **[docs/tools.md](docs/tools.
   <img src="assets/castle/stairs.png" alt="castle stairs" height="64">
   <img src="assets/werewolf_den/obstacle_decor.png" alt="boulder" height="64">
   <img src="assets/aquatic/hazard_primary.png" alt="deep water" height="64">
-  <img src="assets/glaciaire/obstacle_decor.png" alt="frozen statue" height="64">
-  <img src="assets/electronique/obstacle_decor.png" alt="mainframe core" height="64">
+  <img src="assets/glacier/obstacle_decor.png" alt="frozen statue" height="64">
+  <img src="assets/electronic/obstacle_decor.png" alt="mainframe core" height="64">
   <img src="assets/mausoleum/obstacle_decor.png" alt="fallen angel statue" height="64">
 </p>
 
@@ -249,8 +249,8 @@ All variables, the hosted-mode settings, the `.env` lookup order and security no
 Map building is free and offline. Generating new sprites calls FLUX.1-dev through Hugging Face Inference Providers and **costs money per sprite**. The tools never overwrite an existing sprite unless you pass `force`, and the batch script asks for `--yes`:
 
 ```bash
-node scripts/gen-theme-set.mjs VOLCAN --dry-run   # free: shows what would be generated
-node scripts/gen-theme-set.mjs VOLCAN --yes       # paid: about 10 sprites
+node scripts/gen-theme-set.mjs VOLCANO --dry-run   # free: shows what would be generated
+node scripts/gen-theme-set.mjs VOLCANO --yes       # paid: about 10 sprites
 ```
 
 Read **[docs/sprite-generation.md](docs/sprite-generation.md)** before you start.
@@ -281,7 +281,8 @@ docs/               documentation, banner and preview images
 | Command | What it does |
 |---|---|
 | `npm run build` | Compile the server |
-| `npm run smoke` | Start the server and run 62 offline end-to-end checks |
+| `npm test` | Run every offline test suite once; `npm run test:loop` runs them 5 times in a row |
+| `npm run smoke` | Start the server and run 96 offline end-to-end checks, including one loop over all 20 themes |
 | `npm run start:web` | Start the hosted mode (web page and MCP over HTTP) on port 7860 |
 | `npm run smoke:http` | Test the hosted mode offline, with a stand-in for the AI model |
 | `npm run inspect` | Open the server in the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) |

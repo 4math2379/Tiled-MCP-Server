@@ -6,9 +6,9 @@ const A = "./assets/crypt";
 
 export const CRYPT: Theme = {
   key: "CRYPT",
-  name: "Crypte mournevaldienne",
+  name: "Mournevald Crypt",
   description:
-    "Caveaux funéraires sous les chapelles, dalles fissurées, runes mortuaires, gaz toxiques émanant des sarcophages disjoints.",
+    "Burial vaults beneath the chapels, cracked flagstones, funeral runes, toxic gas seeping from broken sarcophagi.",
   tilesetName: "crypt-tileset",
   tilewidth: 64,
   tileheight: 32,

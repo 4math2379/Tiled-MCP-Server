@@ -1,4 +1,4 @@
-// Example map script: builds maps/reseau-electronique-repaire-hacker.tmj (ELECTRONIQUE theme, 64x64: hacker lair in a digital network)
+// Example map script: builds maps/hacker-lair.tmj (ELECTRONIC theme, 64x64: hacker lair in a digital network)
 // by calling the builder API directly, without an MCP client. It is deterministic:
 // re-running it reproduces the committed sample map. Run from the repository root
 // after building the server (npm run build):
@@ -9,10 +9,10 @@ import { saveMapFile } from '../tiled-mcp/dist/tmj.js';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 
-const theme = getTheme("ELECTRONIQUE");
+const theme = getTheme("ELECTRONIC");
 
 const { mapId } = createMap({
-    name: "Reseau Electronique - Repaire Hacker",
+    name: "Electronic Network - Hacker Lair",
     width: 64,
     height: 64,
     theme: theme,
@@ -156,17 +156,17 @@ for (let i = 0; i < 20; i++) {
 placeSpawn(mapId, { x: 31, y: 42, role: "player", name: "player-start" });
 
 // Hacker enemies inside the building
-placeSpawn(mapId, { x: 26, y: 50, role: "enemy", npcName: "Hacker-reseau", name: "hacker-terminal-1" });
-placeSpawn(mapId, { x: 37, y: 50, role: "enemy", npcName: "Hacker-reseau", name: "hacker-terminal-2" });
-placeSpawn(mapId, { x: 31, y: 56, role: "enemy", npcName: "Hacker-reseau", name: "hacker-central" });
-placeSpawn(mapId, { x: 24, y: 55, role: "enemy", npcName: "Securite-numerique", name: "securite-1" });
+placeSpawn(mapId, { x: 26, y: 50, role: "enemy", npcName: "Network Hacker", name: "hacker-terminal-1" });
+placeSpawn(mapId, { x: 37, y: 50, role: "enemy", npcName: "Network Hacker", name: "hacker-terminal-2" });
+placeSpawn(mapId, { x: 31, y: 56, role: "enemy", npcName: "Network Hacker", name: "hacker-central" });
+placeSpawn(mapId, { x: 24, y: 55, role: "enemy", npcName: "Security Daemon", name: "security-1" });
 
 // Guard enemy near the rune's core
-placeSpawn(mapId, { x: 32, y: 20, role: "enemy", npcName: "IA-rogue", name: "ai-core-guardian" });
+placeSpawn(mapId, { x: 32, y: 20, role: "enemy", npcName: "Rogue AI", name: "ai-core-guardian" });
 
 // ---------- Objects ----------
 // Data chest in the building
-placeObject(mapId, { x: 30, y: 58, kind: "chest", name: "coffre-donnees-hacker" });
+placeObject(mapId, { x: 30, y: 58, kind: "chest", name: "hacker-data-chest" });
 
 // Stairs (access to the lower level)
 paintRect(mapId, "ground", 31, 59, 31, 59, "stairs");
@@ -182,7 +182,7 @@ for (const [ix, iy] of runeDecorSpots) {
 
 // ---------- Save the map ----------
 const mapData = serializeMap(mapId);
-const outPath = fileURLToPath(new URL('../maps/reseau-electronique-repaire-hacker.tmj', import.meta.url));
+const outPath = fileURLToPath(new URL('../maps/hacker-lair.tmj', import.meta.url));
 await saveMapFile(mapId, outPath);
 
 console.log("Saved:", outPath);

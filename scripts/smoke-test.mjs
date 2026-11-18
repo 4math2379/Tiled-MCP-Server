@@ -74,6 +74,50 @@ const crypt = themes.find((t) => t.key === "CRYPT");
 check("CRYPT sprites all present", crypt.sprites.status === "all", crypt.sprites);
 check("every theme reports sprite status", themes.every((t) => ["all", "partial", "none"].includes(t.sprites.status)));
 
+// Every theme, in a loop: English key, name and description; each layout preset builds a map
+// the player can walk with no warning; a saved map records its theme and finds its sprites.
+const LEGACY_KEYS = ["GLACIAIRE", "INONDE", "VOLCAN", "FORET", "HIVER", "PRINTEMPS", "ETE", "AUTOMNE", "FUTURISTE", "ELECTRONIQUE"];
+const FRENCH = /[À-ſ]|\b(le|la|les|des|du|et|sous|aux|une|dans|avec)\b/i;
+check("no theme keeps a pre-0.5.0 French key", !themes.some((t) => LEGACY_KEYS.includes(t.key)) && !createMapTool.inputSchema.properties.theme.enum.some((k) => LEGACY_KEYS.includes(k)), themes.map((t) => t.key));
+const PRESETS = [
+  ["generate_crypt_layout", 27, 18, {}],
+  ["generate_castle_floor", 27, 20, { floorVariant: "throne" }],
+  ["generate_werewolf_den", 22, 16, {}],
+];
+for (const t of themes) {
+  const problems = [];
+  if (!/^[A-Z][A-Z_]*$/.test(t.key)) problems.push(`key ${t.key}`);
+  if (FRENCH.test(t.name) || !t.name.trim()) problems.push(`name "${t.name}"`);
+  if (FRENCH.test(t.description) || t.description.length < 20) problems.push(`description "${t.description}"`);
+  for (const [preset, w, h, extra] of PRESETS) {
+    const m = (await call("create_map", { name: `${preset} ${t.key}`, width: w, height: h, theme: t.key })).data;
+    const r = await call(preset, { mapId: m.mapId, ...extra });
+    const v = (await call("validate_map", { mapId: m.mapId })).data;
+    if (r.isError || !v.ok || v.warnings.length) problems.push(`${preset}: ${r.isError ? r.data : JSON.stringify(v.warnings).slice(0, 200)}`);
+    await call("discard_map", { mapId: m.mapId });
+  }
+  const room = (await call("create_map", { name: `Room ${t.key}`, width: 10, height: 8, theme: t.key })).data;
+  await call("generate_room", { mapId: room.mapId, originX: 0, originY: 0, width: 10, height: 8 });
+  await call("place_spawn_player", { mapId: room.mapId, x: 2, y: 4 });
+  const saved = await call("save_to_disk", { mapId: room.mapId, path: `themes/${t.key.toLowerCase()}.tmj` });
+  if (saved.isError) problems.push(`save: ${saved.data}`);
+  else {
+    const file = resolve(outDir, "themes", `${t.key.toLowerCase()}.tmj`);
+    const tmj = JSON.parse(readFileSync(file, "utf8"));
+    if (tmj.properties?.find((p) => p.name === "theme")?.value !== t.key) problems.push("saved map does not record its theme");
+    const images = tmj.tilesets[0].tiles.map((tile) => tile.image).filter(Boolean);
+    if (images.some((img) => !img.includes(`/assets/${t.key.toLowerCase()}/`))) problems.push("sprite paths outside the theme's folder");
+    const missing = images.filter((img) => !existsSync(resolve(dirname(file), img)));
+    if (t.sprites.status === "all" && missing.length) problems.push(`missing sprites: ${missing.join(", ")}`);
+  }
+  await call("discard_map", { mapId: room.mapId });
+  check(`theme ${t.key} ("${t.name}"): English, 3 presets walkable, saves with its sprites`, problems.length === 0, problems);
+}
+const legacyCall = await call("create_map", { name: "Old key", width: 10, height: 8, theme: "GLACIAIRE" });
+check("an old French key is refused with its English replacement", (legacyCall.isError || legacyCall.protocolError) && JSON.stringify(legacyCall).includes("was renamed 'GLACIER'"), legacyCall);
+const { getTheme: themeByKey } = await import("../tiled-mcp/dist/themes/index.js");
+check("the builder API still accepts old French keys", themeByKey("ELECTRONIQUE").key === "ELECTRONIC" && themeByKey("GLACIAIRE").key === "GLACIER");
+
 // Presets: minimum sizes enforced
 const small = (await call("create_map", { name: "small", width: 20, height: 14, theme: "CRYPT" })).data;
 const tooSmall = await call("generate_crypt_layout", { mapId: small.mapId });
@@ -139,7 +183,7 @@ check("saved sprite paths resolve from the file location", missing.length === 0,
 // Paid tools without credentials
 const gen = await call("generate_tile_sprite", { theme: "AQUATIC", role: "wall" });
 check("sprite generation without token: clean message, no network", gen.data.ok === false && /HUGGINGFACE_API_KEY/.test(gen.data.error), gen);
-const prev = await call("preview_sprite_prompt", { theme: "VOLCAN", role: "wall" });
+const prev = await call("preview_sprite_prompt", { theme: "VOLCANO", role: "wall" });
 check("prompt preview works for a newer theme", prev.data.ok && /magenta/.test(prev.data.prompt), prev);
 const ovr = (await call("override_tile_image", { mapId: cm, role: "obstacle_decor", variant: "alembic" })).data;
 check("override to a missing variant warns", ovr.ok && /No file/.test(ovr.warning ?? ""), ovr);

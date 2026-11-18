@@ -1,6 +1,6 @@
 {
   "name": "tiled-mcp-server",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Tiled Map Builder MCP: an MCP server that lets AI agents compose isometric Tiled maps, with sample maps, sprites, an agent skill and docs.",
   "private": true,
   "license": "MIT",
@@ -20,6 +20,8 @@
     "preview": "node scripts/render-map-preview.mjs",
     "smoke": "node scripts/smoke-test.mjs",
     "smoke:http": "node scripts/smoke-http.mjs",
+    "test": "node scripts/test-loop.mjs 1",
+    "test:loop": "node scripts/test-loop.mjs 5",
     "docs": "node scripts/gen-docs.mjs"
   },
   "engines": {

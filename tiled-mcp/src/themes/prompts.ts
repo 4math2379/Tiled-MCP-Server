@@ -16,17 +16,17 @@ export type ThemeKey =
   | "MAUSOLEUM"
   | "BLOOD_TOMB"
     | "AQUATIC"
-    | "GLACIAIRE"
-    | "INONDE"
-    | "VOLCAN"
-    | "FORET"
-    | "HIVER"
-    | "PRINTEMPS"
-    | "ETE"
-    | "AUTOMNE"
+    | "GLACIER"
+    | "FLOODED"
+    | "VOLCANO"
+    | "DARK_FOREST"
+    | "WINTER"
+    | "SPRING"
+    | "SUMMER"
+    | "AUTUMN"
     | "DESOLATION"
-    | "FUTURISTE"
-    | "ELECTRONIQUE";
+    | "FUTURISTIC"
+    | "ELECTRONIC";
 
 interface RoleVisual {
   /** Material / subject description for the tile. */
@@ -539,7 +539,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  GLACIAIRE: {
+  GLACIER: {
     walkable_floor: {
       material: "black ice with trapped air bubbles and frozen debris inside",
       lighting: "dim diffuse pale blue light, low key",
@@ -591,7 +591,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  INONDE: {
+  FLOODED: {
     walkable_floor: {
       material: "stagnant black water with floating debris and oil sheen",
       lighting: "dim diffuse gray-green light, low key",
@@ -643,7 +643,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  VOLCAN: {
+  VOLCANO: {
     walkable_floor: {
       material: "cooled black lava with rough, jagged surface",
       lighting: "dim red ambient glow from below",
@@ -695,7 +695,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  FORET: {
+  DARK_FOREST: {
     walkable_floor: {
       material: "thick moss-covered forest floor with exposed roots",
       lighting: "dappled green ambient light filtering through canopy",
@@ -747,7 +747,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  HIVER: {
+  WINTER: {
     walkable_floor: {
       material: "fresh powder snow with subtle wind ripples",
       lighting: "bright cool white ambient light, low key",
@@ -799,7 +799,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  PRINTEMPS: {
+  SPRING: {
     walkable_floor: {
       material: "green meadow grass with small wildflowers",
       lighting: "soft pale green ambient light, bright",
@@ -851,7 +851,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  ETE: {
+  SUMMER: {
     walkable_floor: {
       material: "golden wheat field with ripe stalks",
       lighting: "warm pale yellow ambient light, bright",
@@ -903,7 +903,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  AUTOMNE: {
+  AUTUMN: {
     walkable_floor: {
       material: "thick carpet of fallen autumn leaves in rust and gold",
       lighting: "soft warm amber ambient light, low key",
@@ -1007,7 +1007,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  FUTURISTE: {
+  FUTURISTIC: {
     walkable_floor: {
       material: "plasteel floor plate with brushed metal finish",
       lighting: "dim cool blue ambient light, low key",
@@ -1059,7 +1059,7 @@ export const ROLE_VISUALS: Partial<Record<ThemeKey, Partial<Record<ThemeRole, Ro
       geometry: "cube",
     },
   },
-  ELECTRONIQUE: {
+  ELECTRONIC: {
     walkable_floor: {
       material: "PCB trace floor with copper lines and solder pads",
       lighting: "dim cool green ambient light, low key",
@@ -1156,9 +1156,9 @@ export function buildPrompt(
   const visual = ROLE_VISUALS[theme]?.[role];
   if (!visual) {
     throw new Error(
-      `Pas de prompt visual défini pour theme=${theme} role=${role}. ` +
-        `Ajoute une entrée dans ROLE_VISUALS dans src/themes/prompts.ts, ` +
-        `ou passe material+lighting via overrides.`,
+      `No prompt visual defined for theme=${theme} role=${role}. ` +
+        `Add an entry to ROLE_VISUALS in src/themes/prompts.ts, ` +
+        `or pass material and lighting as overrides.`,
     );
   }
   const material = overrides?.material ?? visual.material;
@@ -1173,7 +1173,7 @@ export function buildPrompt(
     geometry: visual.geometry,
     dimensions:
       visual.geometry === "surface"
-        ? { width: 1024, height: 1024 } // FLUX préfère carré, on croppe en post-process
+        ? { width: 1024, height: 1024 } // FLUX prefers squares; cropped afterwards
         : { width: 1024, height: 1024 },
   };
 }

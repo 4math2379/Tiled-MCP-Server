@@ -6,9 +6,9 @@ const A = "./assets/village";
 
 export const VILLAGE: Theme = {
   key: "VILLAGE",
-  name: "Village mournevaldien",
+  name: "Mournevald Village",
   description:
-    "Pavés humides luisant sous la pluie perpétuelle, maisons à colombages aux fenêtres closes, étals de marché abandonnés, puits central et potence rouillée sur la place.",
+    "Wet cobblestones gleaming under endless rain, half-timbered houses with shuttered windows, abandoned market stalls, a central well and a rusty gallows on the square.",
   tilesetName: "village-tileset",
   tilewidth: 64,
   tileheight: 32,

@@ -12,26 +12,26 @@ Sprites live in `assets/<theme_lowercase>/<role>.png`.
 
 | Key | Display name | Setting | Roles | Sprites |
 |---|---|---|---|---|
-| `CRYPT` | Crypte mournevaldienne | Burial vaults under chapels, cracked flagstones, poison vents from broken sarcophagi. | 10 | bundled (10/10) |
-| `CASTLE` | Castel Von Drak | Black marble and basalt halls, broken stained glass, throne room, grand stairs. | 9 | bundled (9/9) |
-| `WEREWOLF_DEN` | Tanière de loups-garous | Damp caves dug into the forest, bone-strewn earth floor, claw-marked rock, blood pools. | 8 | bundled (8/8) |
-| `TAVERN_BLOOD_PRINCE` | Auberge du Prince Sanglant | Dark floorboards, heavy beams, oak tables, crackling hearth. No active traps. | 8 | bundled (8/8) |
-| `VILLAGE` | Village mournevaldien | Rain-soaked cobblestones, shuttered half-timbered houses, abandoned stalls, well and gallows. | 7 | bundled (7/7) |
-| `HAUNTED_FOREST` | Forêt de Drakenmark | Stifling undergrowth of black moss, fallen trunks, parasitic mist that slows walkers. | 7 | bundled (7/7) |
-| `MAUSOLEUM` | Mausolée | Grey-veined marble, fallen-angel statues, funeral urns in niches. No hazards. | 8 | bundled (8/8) |
-| `BLOOD_TOMB` | Tombeau de sang | Deep ritual sanctuary, pulsing bleeding runes, central altar. | 8 | bundled (8/8) |
-| `AQUATIC` | Eaux Croupies | Black stagnant water, water lilies, sunken ruins, haunted marsh. | 10 | bundled (10/10) |
-| `GLACIAIRE` | Toundra Glacée | Black ice, figures frozen in the ice, frost, haunted tundra. | 10 | bundled (10/10) |
-| `INONDE` | Cote Inondee | Drowned city under the waves, hanging kelp, broken bridges, deep currents. | 10 | bundled (10/10) |
-| `VOLCAN` | Pente Volcanique | Lava flows, cooled black rock, flying ash, active caldera. | 10 | not generated yet (0/10) |
-| `FORET` | Foret Sombre | Twisted woods, thick moss, exposed roots, misty clearings, quicksand. | 10 | not generated yet (0/10) |
-| `HIVER` | Plaine Enneigee | Powder snow, frozen lakes, frosted branches, trappers' huts. | 10 | not generated yet (0/10) |
-| `PRINTEMPS` | Prairie Printaniere | Flowering meadows, clear streams, budding trees, druid circles. | 10 | not generated yet (0/10) |
-| `ETE` | Plaine Estivale | Golden grass, ripe wheat, cloudless heat, abandoned granaries. | 10 | not generated yet (0/10) |
-| `AUTOMNE` | Foret d'Automne | Russet leaves, mushrooms, morning mist, bog mire. | 10 | not generated yet (0/10) |
-| `DESOLATION` | Terre Desolee | Cold ash, charred trees, barren ground, post-cataclysm ruins. | 10 | not generated yet (0/10) |
-| `FUTURISTE` | Cite Futuriste | Chrome, cold neon, holographic panels, dystopian megacity. | 10 | not generated yet (0/10) |
-| `ELECTRONIQUE` | Reseau Electronique | Circuit boards, optic fibre, silent servers, AI cores. | 10 | bundled (10/10) |
+| `CRYPT` | Mournevald Crypt | Burial vaults under chapels, cracked flagstones, poison vents from broken sarcophagi. | 10 | bundled (10/10) |
+| `CASTLE` | Castle Von Drak | Black marble and basalt halls, broken stained glass, throne room, grand stairs. | 9 | bundled (9/9) |
+| `WEREWOLF_DEN` | Werewolf Den | Damp caves dug into the forest, bone-strewn earth floor, claw-marked rock, blood pools. | 8 | bundled (8/8) |
+| `TAVERN_BLOOD_PRINCE` | Blood Prince Inn | Dark floorboards, heavy beams, oak tables, crackling hearth. No active traps. | 8 | bundled (8/8) |
+| `VILLAGE` | Mournevald Village | Rain-soaked cobblestones, shuttered half-timbered houses, abandoned stalls, well and gallows. | 7 | bundled (7/7) |
+| `HAUNTED_FOREST` | Drakenmark Forest | Stifling undergrowth of black moss, fallen trunks, parasitic mist that slows walkers. | 7 | bundled (7/7) |
+| `MAUSOLEUM` | Mausoleum | Grey-veined marble, fallen-angel statues, funeral urns in niches. No hazards. | 8 | bundled (8/8) |
+| `BLOOD_TOMB` | Blood Tomb | Deep ritual sanctuary, pulsing bleeding runes, central altar. | 8 | bundled (8/8) |
+| `AQUATIC` | Stagnant Waters | Black stagnant water, water lilies, sunken ruins, haunted marsh. | 10 | bundled (10/10) |
+| `GLACIER` | Frozen Tundra | Black ice, figures frozen in the ice, frost, haunted tundra. | 10 | bundled (10/10) |
+| `FLOODED` | Flooded Coast | Drowned city under the waves, hanging kelp, broken bridges, deep currents. | 10 | bundled (10/10) |
+| `VOLCANO` | Volcanic Slope | Lava flows, cooled black rock, flying ash, active caldera. | 10 | not generated yet (0/10) |
+| `DARK_FOREST` | Dark Forest | Twisted woods, thick moss, exposed roots, misty clearings, quicksand. | 10 | not generated yet (0/10) |
+| `WINTER` | Snowy Plain | Powder snow, frozen lakes, frosted branches, trappers' huts. | 10 | not generated yet (0/10) |
+| `SPRING` | Spring Meadow | Flowering meadows, clear streams, budding trees, druid circles. | 10 | not generated yet (0/10) |
+| `SUMMER` | Summer Plain | Golden grass, ripe wheat, cloudless heat, abandoned granaries. | 10 | not generated yet (0/10) |
+| `AUTUMN` | Autumn Forest | Russet leaves, mushrooms, morning mist, bog mire. | 10 | not generated yet (0/10) |
+| `DESOLATION` | Desolate Land | Cold ash, charred trees, barren ground, post-cataclysm ruins. | 10 | not generated yet (0/10) |
+| `FUTURISTIC` | Futuristic City | Chrome, cold neon, holographic panels, dystopian megacity. | 10 | not generated yet (0/10) |
+| `ELECTRONIC` | Electronic Network | Circuit boards, optic fibre, silent servers, AI cores. | 10 | bundled (10/10) |
 
 ## Roles per theme
 
@@ -46,59 +46,59 @@ Sprites live in `assets/<theme_lowercase>/<role>.png`.
 | `MAUSOLEUM` | `walkable_floor`, `walkable_floor_alt`, `wall`, `difficult_terrain`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
 | `BLOOD_TOMB` | `walkable_floor`, `walkable_floor_alt`, `wall`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed` |
 | `AQUATIC` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `GLACIAIRE` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `INONDE` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `VOLCAN` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `FORET` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `HIVER` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `PRINTEMPS` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `ETE` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `AUTOMNE` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `GLACIER` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `FLOODED` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `VOLCANO` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `DARK_FOREST` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `WINTER` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `SPRING` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `SUMMER` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `AUTUMN` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
 | `DESOLATION` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `FUTURISTE` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
-| `ELECTRONIQUE` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `FUTURISTIC` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
+| `ELECTRONIC` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` |
 
 ## Original descriptions
 
-**CRYPT** (Crypte mournevaldienne): Caveaux funéraires sous les chapelles, dalles fissurées, runes mortuaires, gaz toxiques émanant des sarcophages disjoints.
+**CRYPT** (Mournevald Crypt): Burial vaults beneath the chapels, cracked flagstones, funeral runes, toxic gas seeping from broken sarcophagi.
 
-**CASTLE** (Castel Von Drak): Marbres noirs, basalte poli, vitraux brisés, bannières frappées du blason des Von Drak. Salle du trône, escaliers grandioses, candélabres en fer noir.
+**CASTLE** (Castle Von Drak): Black marble, polished basalt, shattered stained glass, banners bearing the Von Drak crest. Throne room, grand staircases, black iron candelabra.
 
-**WEREWOLF_DEN** (Tanière de loups-garous): Cavernes humides creusées dans la forêt de Drakenmark, sol en terre battue jonché d'ossements, parois rocheuses entaillées par les griffes, mares de sang frénétique près des proies récentes.
+**WEREWOLF_DEN** (Werewolf Den): Damp caves dug into the Drakenmark forest, packed-earth floor strewn with bones, rock walls scored by claws, pools of blood near fresh prey.
 
-**TAVERN_BLOOD_PRINCE** (Auberge du Prince Sanglant): Parquet sombre, enduit fissuré, lourde charpente apparente. Tables rondes en chêne, âtre crépitant, bar marbré de taches anciennes. Pas de pièges actifs — la peur suffit.
+**TAVERN_BLOOD_PRINCE** (Blood Prince Inn): Dark floorboards, cracked plaster, heavy exposed beams. Round oak tables, a crackling hearth, a bar marked with old stains. No active traps: fear is enough.
 
-**VILLAGE** (Village mournevaldien): Pavés humides luisant sous la pluie perpétuelle, maisons à colombages aux fenêtres closes, étals de marché abandonnés, puits central et potence rouillée sur la place.
+**VILLAGE** (Mournevald Village): Wet cobblestones gleaming under endless rain, half-timbered houses with shuttered windows, abandoned market stalls, a central well and a rusty gallows on the square.
 
-**HAUNTED_FOREST** (Forêt de Drakenmark): Sous-bois étouffant de mousses noires, troncs morts couchés, brumes parasitaires qui s'enroulent autour des chevilles et ralentissent la marche.
+**HAUNTED_FOREST** (Drakenmark Forest): Stifling undergrowth of black moss, fallen dead trunks, clinging mists that coil around the ankles and slow every step.
 
-**MAUSOLEUM** (Mausolée): Marbre veiné de gris, statues d'anges déchus aux ailes brisées, urnes funéraires alignées dans les niches, chuchotements à la limite de l'audible.
+**MAUSOLEUM** (Mausoleum): Grey-veined marble, statues of fallen angels with broken wings, funeral urns lined up in niches, whispers at the edge of hearing.
 
-**BLOOD_TOMB** (Tombeau de sang): Sanctuaire profond consacré aux pactes anciens. Dalles rituelles, runes saignantes qui pulsent au passage, autel central, candélabres en fer noir. Le sang ne sèche jamais sur ce sol.
+**BLOOD_TOMB** (Blood Tomb): A deep sanctuary devoted to ancient pacts. Ritual slabs, bleeding runes that pulse as you pass, a central altar, black iron candelabra. Blood never dries on this floor.
 
-**AQUATIC** (Eaux Croupies): Eaux noires stagnantes, nénuphars, ruines submergées, brume sur l'eau. Marais hanté, pontons pourris, cryptes inondées.
+**AQUATIC** (Stagnant Waters): Black stagnant water, water lilies, sunken ruins, mist on the water. Haunted marsh, rotten pontoons, flooded crypts.
 
-**GLACIAIRE** (Toundra Glacée): Glace noire, figures gelées prises dans la glace, givre, stalactites de pierre. Toundra hantée, pontons de gel, cryptes sous pergélisol.
+**GLACIER** (Frozen Tundra): Black ice, figures frozen in the ice, frost, stone stalactites. Haunted tundra, frozen pontoons, crypts under the permafrost.
 
-**INONDE** (Cote Inondee): Villes englouties sous les flots, ruines submergees, algues pendantes, eaux saumustres. Quartiers noyés, ponts rompus, cryptes immergees.
+**FLOODED** (Flooded Coast): Towns swallowed by the sea, sunken ruins, hanging seaweed, brackish water. Drowned districts, broken bridges, submerged crypts.
 
-**VOLCAN** (Pente Volcanique): Coulées de lave, roches noires refroidies, cendres volantes, chaleur étouffante. Caldera active, ponts de basalte, cryptes de cendre.
+**VOLCANO** (Volcanic Slope): Lava flows, cooled black rock, drifting ash, stifling heat. Active caldera, basalt bridges, crypts of ash.
 
-**FORET** (Foret Sombre): Bois sylvains tordus, mousse épaisse, racines apparentes, clairières brumeuses. Foret hantée, huttes de bûcherons, tombes sous les chênes.
+**DARK_FOREST** (Dark Forest): Twisted woods, thick moss, exposed roots, misty clearings. Haunted forest, woodcutters' huts, graves under the oaks.
 
-**HIVER** (Plaine Enneigee): Neige poudreuse, lacs gelés, branches givrées, brouillard glacial. Toundra hivernale, refuges de trappeurs, tombeaux sous la neige.
+**WINTER** (Snowy Plain): Powder snow, frozen lakes, frosted branches, freezing fog. Winter tundra, trappers' shelters, tombs under the snow.
 
-**PRINTEMPS** (Prairie Printaniere): Champs en fleurs, herbe tendre, ruisseaux clairs, arbres en bourgeon. Prairies ouvertes, cercles de druides, fontaines sacrées.
+**SPRING** (Spring Meadow): Fields in bloom, tender grass, clear streams, budding trees. Open meadows, druid circles, sacred fountains.
 
-**ETE** (Plaine Estivale): Herbe dorée, blés mûrs, ciel sans nuage, chaleur accablante. Moissons, greniers abandonnés, ossuaires sous le soleil.
+**SUMMER** (Summer Plain): Golden grass, ripe wheat, cloudless sky, crushing heat. Harvest fields, abandoned granaries, ossuaries under the sun.
 
-**AUTOMNE** (Foret d'Automne): Feuilles rousses, champignons, brume matinale, gibier traqué. Bois automnal, sentiers couverts, tombes sous les érables.
+**AUTUMN** (Autumn Forest): Russet leaves, mushrooms, morning mist, hunted game. Autumn woods, leaf-covered paths, graves under the maples.
 
-**DESOLATION** (Terre Desolee): Cendres froides, arbres carbonisés, sols stériles, ciel gris. Paysage post-cataclysmique, ruines calcinées, ossuaires à ciel ouvert.
+**DESOLATION** (Desolate Land): Cold ash, charred trees, barren ground, grey sky. Post-cataclysm landscape, burnt ruins, open-air ossuaries.
 
-**FUTURISTE** (Cite Futuriste): Métal chromé, néons froids, panneaux holographiques, gratte-ciel en ruine. Megalopole dystopique, laboratoires secrets, cités volantes.
+**FUTURISTIC** (Futuristic City): Chrome metal, cold neon, holographic panels, ruined skyscrapers. Dystopian megacity, secret laboratories, flying cities.
 
-**ELECTRONIQUE** (Reseau Electronique): Circuits imprimés, fibres optiques, données en flux, serveurs silencieux. Matrice numérique, nœuds de calcul, foyers d'IA.
+**ELECTRONIC** (Electronic Network): Printed circuits, optical fibres, streaming data, silent servers. Digital matrix, compute nodes, AI cores.
 
 ## Adding a theme
 

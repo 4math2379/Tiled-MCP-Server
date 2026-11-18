@@ -6,9 +6,9 @@ const A = "./assets/aquatic";
 
 export const AQUATIC: Theme = {
   key: "AQUATIC",
-  name: "Eaux Croupies",
+  name: "Stagnant Waters",
   description:
-    "Eaux noires stagnantes, nénuphars, ruines submergées, brume sur l'eau. Marais hanté, pontons pourris, cryptes inondées.",
+    "Black stagnant water, water lilies, sunken ruins, mist on the water. Haunted marsh, rotten pontoons, flooded crypts.",
   tilesetName: "aquatic-tileset",
   tilewidth: 64,
   tileheight: 32,

@@ -6,9 +6,9 @@ const A = "./assets/haunted_forest";
 
 export const HAUNTED_FOREST: Theme = {
   key: "HAUNTED_FOREST",
-  name: "Forêt de Drakenmark",
+  name: "Drakenmark Forest",
   description:
-    "Sous-bois étouffant de mousses noires, troncs morts couchés, brumes parasitaires qui s'enroulent autour des chevilles et ralentissent la marche.",
+    "Stifling undergrowth of black moss, fallen dead trunks, clinging mists that coil around the ankles and slow every step.",
   tilesetName: "forest-tileset",
   tilewidth: 64,
   tileheight: 32,

@@ -14,7 +14,7 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "name": "glaciaire-tileset",
+      "name": "glacier-tileset",
       "tilewidth": 64,
       "tileheight": 32,
       "tilecount": 10,
@@ -30,11 +30,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.black_ice",
+              "value": "glacier.black_ice",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/walkable_floor.png",
+          "image": "../assets/glacier/walkable_floor.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -48,11 +48,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.frost_flagstone",
+              "value": "glacier.frost_flagstone",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/walkable_floor_alt.png",
+          "image": "../assets/glacier/walkable_floor_alt.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -66,11 +66,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.glacial_ice",
+              "value": "glacier.glacial_ice",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/wall.png",
+          "image": "../assets/glacier/wall.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -84,11 +84,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.frost_corner",
+              "value": "glacier.frost_corner",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/wall_corner.png",
+          "image": "../assets/glacier/wall_corner.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -102,11 +102,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.cracked_ice",
+              "value": "glacier.cracked_ice",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/difficult_terrain.png",
+          "image": "../assets/glacier/difficult_terrain.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -120,11 +120,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.thin_ice",
+              "value": "glacier.thin_ice",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/hazard_primary.png",
+          "image": "../assets/glacier/hazard_primary.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -138,11 +138,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.frozen_statue",
+              "value": "glacier.frozen_statue",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/obstacle_decor.png",
+          "image": "../assets/glacier/obstacle_decor.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -156,11 +156,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.icicles",
+              "value": "glacier.icicles",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/decoration_minor.png",
+          "image": "../assets/glacier/decoration_minor.png",
           "imagewidth": 64,
           "imageheight": 32
         },
@@ -174,11 +174,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.frosted_door",
+              "value": "glacier.frosted_door",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/door_closed.png",
+          "image": "../assets/glacier/door_closed.png",
           "imagewidth": 64,
           "imageheight": 64
         },
@@ -192,11 +192,11 @@
             },
             {
               "name": "spriteId",
-              "value": "glaciaire.ice_stairs",
+              "value": "glacier.ice_stairs",
               "type": "string"
             }
           ],
-          "image": "../assets/glaciaire/stairs.png",
+          "image": "../assets/glacier/stairs.png",
           "imagewidth": 64,
           "imageheight": 64
         }
@@ -257,7 +257,7 @@
           "y": 1024,
           "width": 32,
           "height": 32,
-          "name": "coffre-sur-le-lac",
+          "name": "lake-chest",
           "type": "chest",
           "visible": true,
           "rotation": 0,
@@ -280,7 +280,7 @@
           "y": 192,
           "width": 32,
           "height": 32,
-          "name": "coffre-ne",
+          "name": "north-east-chest",
           "type": "chest",
           "visible": true,
           "rotation": 0,
@@ -303,7 +303,7 @@
           "y": 1024,
           "width": 32,
           "height": 32,
-          "name": "levier-pont-levis",
+          "name": "drawbridge-lever",
           "type": "lever",
           "visible": true,
           "rotation": 0,
@@ -349,7 +349,7 @@
             },
             {
               "name": "npcName",
-              "value": "Seigneur des Glaces",
+              "value": "Ice Lord",
               "type": "string"
             }
           ]
@@ -388,7 +388,7 @@
             },
             {
               "name": "npcName",
-              "value": "Givre-Rôdeur",
+              "value": "Frost Stalker",
               "type": "string"
             }
           ]
@@ -410,7 +410,7 @@
             },
             {
               "name": "npcName",
-              "value": "Givre-Rôdeur",
+              "value": "Frost Stalker",
               "type": "string"
             }
           ]
@@ -432,7 +432,7 @@
             },
             {
               "name": "npcName",
-              "value": "Esprit de Glace",
+              "value": "Ice Spirit",
               "type": "string"
             }
           ]
@@ -454,7 +454,7 @@
             },
             {
               "name": "npcName",
-              "value": "Esprit de Glace",
+              "value": "Ice Spirit",
               "type": "string"
             }
           ]
@@ -476,7 +476,7 @@
             },
             {
               "name": "npcName",
-              "value": "Givre-Rôdeur",
+              "value": "Frost Stalker",
               "type": "string"
             }
           ]
@@ -498,7 +498,7 @@
             },
             {
               "name": "npcName",
-              "value": "Givre-Rôdeur",
+              "value": "Frost Stalker",
               "type": "string"
             }
           ]
@@ -513,12 +513,12 @@
   "properties": [
     {
       "name": "theme",
-      "value": "GLACIAIRE",
+      "value": "GLACIER",
       "type": "string"
     },
     {
       "name": "mapName",
-      "value": "Forteresse de Glace - Donjon Principal v4",
+      "value": "Ice Fortress - Main Keep",
       "type": "string"
     }
   ]

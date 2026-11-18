@@ -47,7 +47,7 @@ Creates an empty isometric (default) or orthogonal Tiled map in the given theme 
 | `name` | string | yes | Display name of the map, e.g. 'Crypt under the abandoned chapel'. 1..120 chars |
 | `width` | integer | yes | Width in cells, 4..256 (1 cell = 5 ft in tabletop terms). 4..256 |
 | `height` | integer | yes | Height in cells, 4..256. 4..256 |
-| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIAIRE`, `INONDE`, `VOLCAN`, `FORET`, `HIVER`, `PRINTEMPS`, `ETE`, `AUTOMNE`, `DESOLATION`, `FUTURISTE`, `ELECTRONIQUE` | yes | Theme key from list_themes, e.g. CRYPT |
+| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIER`, `FLOODED`, `VOLCANO`, `DARK_FOREST`, `WINTER`, `SPRING`, `SUMMER`, `AUTUMN`, `DESOLATION`, `FUTURISTIC`, `ELECTRONIC` | yes | Theme key from list_themes, e.g. CRYPT |
 | `orientation` | `isometric`, `orthogonal` | no | Defaults to isometric |
 
 ### list_maps
@@ -383,7 +383,7 @@ Free: returns the exact FLUX prompt, geometry and size generate_tile_sprite woul
 
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
-| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIAIRE`, `INONDE`, `VOLCAN`, `FORET`, `HIVER`, `PRINTEMPS`, `ETE`, `AUTOMNE`, `DESOLATION`, `FUTURISTE`, `ELECTRONIQUE` | yes | Theme key from list_themes |
+| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIER`, `FLOODED`, `VOLCANO`, `DARK_FOREST`, `WINTER`, `SPRING`, `SUMMER`, `AUTUMN`, `DESOLATION`, `FUTURISTIC`, `ELECTRONIC` | yes | Theme key from list_themes |
 | `role` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` | yes | Tile role, e.g. walkable_floor, wall, obstacle_decor |
 | `material` | string | no |  |
 | `lighting` | string | no |  |
@@ -397,7 +397,7 @@ PAID: generates one isometric sprite for (theme, role) with FLUX.1-dev via Huggi
 
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
-| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIAIRE`, `INONDE`, `VOLCAN`, `FORET`, `HIVER`, `PRINTEMPS`, `ETE`, `AUTOMNE`, `DESOLATION`, `FUTURISTE`, `ELECTRONIQUE` | yes | Theme key from list_themes |
+| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIER`, `FLOODED`, `VOLCANO`, `DARK_FOREST`, `WINTER`, `SPRING`, `SUMMER`, `AUTUMN`, `DESOLATION`, `FUTURISTIC`, `ELECTRONIC` | yes | Theme key from list_themes |
 | `role` | `walkable_floor`, `walkable_floor_alt`, `wall`, `wall_corner`, `difficult_terrain`, `hazard_primary`, `obstacle_decor`, `decoration_minor`, `door_closed`, `stairs` | yes | Tile role, e.g. walkable_floor, wall, obstacle_decor |
 | `variant` | string | no | Contextual variant slug, e.g. 'alembic' for a laboratory: saved as <role>__<variant>.png and bound to a map with override_tile_image. pattern `^[a-z0-9_]+$` |
 | `material` | string | no | Override of the material description, e.g. 'alchemical workbench with brass alembics' |
@@ -415,7 +415,7 @@ PAID and slow: generates every sprite of a theme that is missing on disk (about 
 
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
-| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIAIRE`, `INONDE`, `VOLCAN`, `FORET`, `HIVER`, `PRINTEMPS`, `ETE`, `AUTOMNE`, `DESOLATION`, `FUTURISTE`, `ELECTRONIQUE` | yes | Theme key from list_themes |
+| `theme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIER`, `FLOODED`, `VOLCANO`, `DARK_FOREST`, `WINTER`, `SPRING`, `SUMMER`, `AUTUMN`, `DESOLATION`, `FUTURISTIC`, `ELECTRONIC` | yes | Theme key from list_themes |
 | `force` | boolean | no | Regenerate sprites that already exist (paid again) |
 | `seed` | integer | no | -9007199254740991..9007199254740991 |
 
@@ -468,7 +468,7 @@ Puts a building on an outdoor map and, by default, creates its interior as a new
 | `name` | string | no | Display name, e.g. 'Miller house'; also the base of the building id. 1..80 chars |
 | `door` | `south`, `east` | no | Footprint edge with the door: south (default, bottom-left face) or east (bottom-right face) |
 | `interior` | boolean | no | Create and link an interior map (default true); false places a building that cannot be entered |
-| `interiorTheme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIAIRE`, `INONDE`, `VOLCAN`, `FORET`, `HIVER`, `PRINTEMPS`, `ETE`, `AUTOMNE`, `DESOLATION`, `FUTURISTE`, `ELECTRONIQUE` | no | Theme of the interior (default per type: TAVERN_BLOOD_PRINCE, MAUSOLEUM or CASTLE) |
+| `interiorTheme` | `CRYPT`, `CASTLE`, `WEREWOLF_DEN`, `TAVERN_BLOOD_PRINCE`, `VILLAGE`, `HAUNTED_FOREST`, `MAUSOLEUM`, `BLOOD_TOMB`, `AQUATIC`, `GLACIER`, `FLOODED`, `VOLCANO`, `DARK_FOREST`, `WINTER`, `SPRING`, `SUMMER`, `AUTUMN`, `DESOLATION`, `FUTURISTIC`, `ELECTRONIC` | no | Theme of the interior (default per type: TAVERN_BLOOD_PRINCE, MAUSOLEUM or CASTLE) |
 | `interiorWidth` | integer | no | Interior width in cells (default per type). 5..256 |
 | `interiorHeight` | integer | no | Interior height in cells (default per type). 5..256 |
 | `spriteVariant` | string | no | Use assets/buildings/<type>__<variant>.png instead of <type>.png. pattern `^[a-z0-9_]+$` |

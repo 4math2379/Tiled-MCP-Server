@@ -6,9 +6,9 @@ const A = "./assets/blood_tomb";
 
 export const BLOOD_TOMB: Theme = {
   key: "BLOOD_TOMB",
-  name: "Tombeau de sang",
+  name: "Blood Tomb",
   description:
-    "Sanctuaire profond consacré aux pactes anciens. Dalles rituelles, runes saignantes qui pulsent au passage, autel central, candélabres en fer noir. Le sang ne sèche jamais sur ce sol.",
+    "A deep sanctuary devoted to ancient pacts. Ritual slabs, bleeding runes that pulse as you pass, a central altar, black iron candelabra. Blood never dries on this floor.",
   tilesetName: "blood-tomb-tileset",
   tilewidth: 64,
   tileheight: 32,

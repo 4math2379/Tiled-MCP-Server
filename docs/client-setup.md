@@ -190,4 +190,4 @@ This opens the official [MCP Inspector](https://github.com/modelcontextprotocol/
 your browser, connected to the server. You can list the tools, call `create_map`, then
 `generate_crypt_layout`, then `save_to_disk`, and open the file in Tiled.
 
-For an automated check, `npm run smoke` runs 39 end-to-end checks without any network access.
+For an automated check, `npm run smoke` runs 96 end-to-end checks without any network access.

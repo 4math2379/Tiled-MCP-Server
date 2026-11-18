@@ -80,17 +80,17 @@ Structured (recommended for complex maps):
 | cave, den, lair, beasts | `WEREWOLF_DEN` |
 | inn, tavern, interior | `TAVERN_BLOOD_PRINCE` |
 | village, square, market, street | `VILLAGE` |
-| haunted forest, undergrowth, clearing | `HAUNTED_FOREST` or `FORET` |
+| haunted forest, undergrowth, clearing | `HAUNTED_FOREST` or `DARK_FOREST` |
 | mausoleum, tomb, statues | `MAUSOLEUM` |
 | blood ritual, altar, sanctuary | `BLOOD_TOMB` |
 | swamp, stagnant water, sunken ruins | `AQUATIC` |
-| flooded city, drowned district | `INONDE` |
-| ice, frozen fortress, tundra | `GLACIAIRE` or `HIVER` |
-| volcano, lava, ash | `VOLCAN` |
-| seasons: spring, summer, autumn | `PRINTEMPS`, `ETE`, `AUTOMNE` |
+| flooded city, drowned district | `FLOODED` |
+| ice, frozen fortress, tundra | `GLACIER` or `WINTER` |
+| volcano, lava, ash | `VOLCANO` |
+| seasons: spring, summer, autumn | `SPRING`, `SUMMER`, `AUTUMN` |
 | wasteland, ruins after a cataclysm | `DESOLATION` |
-| futuristic city, laboratory, neon | `FUTURISTE` |
-| digital network, servers, hacker | `ELECTRONIQUE` |
+| futuristic city, laboratory, neon | `FUTURISTIC` |
+| digital network, servers, hacker | `ELECTRONIC` |
 
 ### Step 2: reference material (optional)
 
@@ -220,15 +220,15 @@ in Step 4); until they exist Tiled shows placeholders and the map still works.
   but costly obstacle.
 - **WEREWOLF_DEN**: an alpha lair with boulders in the corners and bone piles
   (`difficult_terrain`), several scattered enemy spawns, no locked doors (caves).
-- **HAUNTED_FOREST / FORET**: no full perimeter walls (open forest); use `obstacle_decor`
+- **HAUNTED_FOREST / DARK_FOREST**: no full perimeter walls (open forest); use `obstacle_decor`
   (boulders, standing stones) to create chokepoints; parasitic mist (HAUNTED_FOREST) or
-  quicksand (FORET) as hazards in damp areas.
+  quicksand (DARK_FOREST) as hazards in damp areas.
 - **MAUSOLEUM**: fallen-angel statues as obstacles, several small alcoves, no hazards
   (the theme has none: the mood is contemplative).
-- **AQUATIC / INONDE**: deep water or currents as `hazard_primary`, stepping paths of floor tiles.
-- **GLACIAIRE / HIVER**: cracked ice or slush (`difficult_terrain`) slows movement, thin ice is
+- **AQUATIC / FLOODED**: deep water or currents as `hazard_primary`, stepping paths of floor tiles.
+- **GLACIER / WINTER**: cracked ice or slush (`difficult_terrain`) slows movement, thin ice is
   the hazard; open frozen halls.
-- **VOLCAN**: lava flows as hazards with narrow bridges of floor tiles.
+- **VOLCANO**: lava flows as hazards with narrow bridges of floor tiles.
 - **TAVERN_BLOOD_PRINCE / VILLAGE**: social scenes; tables or the well as obstacles,
   friendly NPC spawns, few or no traps.
 

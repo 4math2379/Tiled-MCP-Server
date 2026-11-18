@@ -15,8 +15,8 @@ From the repository root:
 ```bash
 npm install
 npm run build         # tsc: src/ -> dist/
-npm run smoke         # 38 offline end-to-end checks (stdio)
-npm run smoke:http    # offline checks of the hosted mode
+npm test              # every offline suite (stdio, legacy coordinates, hosted mode)
+npm run test:loop     # the same 5 times in a row
 npm run start:web     # hosted mode on http://127.0.0.1:7860
 ```
 

@@ -1294,7 +1294,7 @@
           "y": 192,
           "width": 32,
           "height": 32,
-          "name": "Coffre verrouillé (chambre nord)",
+          "name": "Locked chest (north chamber)",
           "type": "chest",
           "visible": true,
           "rotation": 0,
@@ -1322,7 +1322,7 @@
           "y": 256,
           "width": 32,
           "height": 32,
-          "name": "Piège à fléchettes devant la crypte",
+          "name": "Dart trap before the crypt",
           "type": "trap",
           "visible": true,
           "rotation": 0,
@@ -1388,7 +1388,7 @@
           "x": 304.0,
           "y": 208.0,
           "point": true,
-          "name": "Squelette patrouille nef (gauche)",
+          "name": "Skeleton patrol, nave (left)",
           "type": "enemy",
           "visible": true,
           "rotation": 0,
@@ -1400,7 +1400,7 @@
             },
             {
               "name": "npcName",
-              "value": "Squelette",
+              "value": "Skeleton",
               "type": "string"
             }
           ]
@@ -1410,7 +1410,7 @@
           "x": 368.0,
           "y": 208.0,
           "point": true,
-          "name": "Squelette patrouille nef (droite)",
+          "name": "Skeleton patrol, nave (right)",
           "type": "enemy",
           "visible": true,
           "rotation": 0,
@@ -1422,7 +1422,7 @@
             },
             {
               "name": "npcName",
-              "value": "Squelette",
+              "value": "Skeleton",
               "type": "string"
             }
           ]
@@ -1432,7 +1432,7 @@
           "x": 400.0,
           "y": 400.0,
           "point": true,
-          "name": "Bastellus (dort dans la crypte centrale)",
+          "name": "Bastellus (asleep in the central crypt)",
           "type": "enemy",
           "visible": true,
           "rotation": 0,
@@ -1464,7 +1464,7 @@
     },
     {
       "name": "mapName",
-      "value": "Crypte sous la chapelle abandonnée",
+      "value": "Crypt under the abandoned chapel",
       "type": "string"
     }
   ]

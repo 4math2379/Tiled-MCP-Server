@@ -257,7 +257,7 @@
           "y": 1024,
           "width": 32,
           "height": 32,
-          "name": "sarcophage-submerge",
+          "name": "sunken-sarcophagus",
           "type": "chest",
           "visible": true,
           "rotation": 0,
@@ -303,7 +303,7 @@
             },
             {
               "name": "npcName",
-              "value": "Seigneur des Abysses",
+              "value": "Lord of the Depths",
               "type": "string"
             }
           ]
@@ -342,7 +342,7 @@
             },
             {
               "name": "npcName",
-              "value": "Rampant des Eaux",
+              "value": "Water Crawler",
               "type": "string"
             }
           ]
@@ -364,7 +364,7 @@
             },
             {
               "name": "npcName",
-              "value": "Rampant des Eaux",
+              "value": "Water Crawler",
               "type": "string"
             }
           ]
@@ -386,7 +386,7 @@
             },
             {
               "name": "npcName",
-              "value": "Esprit de l'Onde",
+              "value": "Wave Spirit",
               "type": "string"
             }
           ]
@@ -408,7 +408,7 @@
             },
             {
               "name": "npcName",
-              "value": "Esprit de l'Onde",
+              "value": "Wave Spirit",
               "type": "string"
             }
           ]
@@ -430,7 +430,7 @@
             },
             {
               "name": "npcName",
-              "value": "Rampant des Eaux",
+              "value": "Water Crawler",
               "type": "string"
             }
           ]
@@ -452,7 +452,7 @@
             },
             {
               "name": "npcName",
-              "value": "Rampant des Eaux",
+              "value": "Water Crawler",
               "type": "string"
             }
           ]
@@ -472,7 +472,7 @@
     },
     {
       "name": "mapName",
-      "value": "Caverne Aquatique Souterraine",
+      "value": "Underground Water Cavern",
       "type": "string"
     }
   ]

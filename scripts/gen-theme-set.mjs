@@ -3,10 +3,10 @@
 // skips sprites that already exist (unless --force). Each generated sprite is a paid call.
 //
 // Usage (from the repository root, after npm install && npm run build):
-//   node scripts/gen-theme-set.mjs VOLCAN --yes
-//   node scripts/gen-theme-set.mjs VOLCAN HIVER ETE --yes
+//   node scripts/gen-theme-set.mjs VOLCANO --yes
+//   node scripts/gen-theme-set.mjs VOLCANO WINTER SUMMER --yes
 //   node scripts/gen-theme-set.mjs --missing --yes     # every theme with missing sprites
-//   node scripts/gen-theme-set.mjs --dry-run VOLCAN    # list what would be generated, free
+//   node scripts/gen-theme-set.mjs --dry-run VOLCANO    # list what would be generated, free
 //
 // Needs HUGGINGFACE_API_KEY (or HF_TOKEN) in the environment or in tiled-mcp/.env.
 // See docs/sprite-generation.md for costs and providers.

@@ -6,9 +6,9 @@ const A = "./assets/tavern_blood_prince";
 
 export const TAVERN_BLOOD_PRINCE: Theme = {
   key: "TAVERN_BLOOD_PRINCE",
-  name: "Auberge du Prince Sanglant",
+  name: "Blood Prince Inn",
   description:
-    "Parquet sombre, enduit fissuré, lourde charpente apparente. Tables rondes en chêne, âtre crépitant, bar marbré de taches anciennes. Pas de pièges actifs — la peur suffit.",
+    "Dark floorboards, cracked plaster, heavy exposed beams. Round oak tables, a crackling hearth, a bar marked with old stains. No active traps: fear is enough.",
   tilesetName: "tavern-tileset",
   tilewidth: 64,
   tileheight: 32,

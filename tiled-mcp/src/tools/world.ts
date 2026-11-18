@@ -7,7 +7,7 @@ import { isHosted } from "../context.js";
 import { publishWorld } from "../downloads.js";
 import { slugify } from "../names.js";
 import { mapsRoot, resolveUserPath } from "../paths.js";
-import { THEME_KEYS } from "../themes/index.js";
+import { themeKeySchema } from "../themes/index.js";
 import { saveMapFile } from "../tmj.js";
 import { linkMaps, placeBuilding, validateWorld, worldOf } from "../world.js";
 import { GRID_HELP, asText } from "./util.js";
@@ -40,7 +40,7 @@ export function registerWorldTools(server: McpServer): void {
         name: z.string().min(1).max(80).optional().describe("Display name, e.g. 'Miller house'; also the base of the building id"),
         door: z.enum(["south", "east"]).optional().describe("Footprint edge with the door: south (default, bottom-left face) or east (bottom-right face)"),
         interior: z.boolean().optional().describe("Create and link an interior map (default true); false places a building that cannot be entered"),
-        interiorTheme: z.enum(THEME_KEYS).optional().describe("Theme of the interior (default per type: TAVERN_BLOOD_PRINCE, MAUSOLEUM or CASTLE)"),
+        interiorTheme: themeKeySchema().optional().describe("Theme of the interior (default per type: TAVERN_BLOOD_PRINCE, MAUSOLEUM or CASTLE)"),
         interiorWidth: z.number().int().min(5).max(max).optional().describe("Interior width in cells (default per type)"),
         interiorHeight: z.number().int().min(5).max(max).optional().describe("Interior height in cells (default per type)"),
         spriteVariant: z

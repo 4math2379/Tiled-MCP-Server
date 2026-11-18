@@ -1,4 +1,4 @@
-// Example map script: builds maps/forteresse-glace-etage.tmj (GLACIAIRE theme, 64x64: ice fortress with a circular central hall)
+// Example map script: builds maps/ice-fortress.tmj (GLACIER theme, 64x64: ice fortress with a circular central hall)
 // by calling the builder API directly, without an MCP client. It is deterministic:
 // re-running it reproduces the committed sample map. Run from the repository root
 // after building the server (npm run build):
@@ -9,10 +9,10 @@ import { saveMapFile } from '../tiled-mcp/dist/tmj.js';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 
-const theme = getTheme("GLACIAIRE");
+const theme = getTheme("GLACIER");
 
 const { mapId } = createMap({
-    name: "Forteresse de Glace - Donjon Principal v4",
+    name: "Ice Fortress - Main Keep",
     width: 64,
     height: 64,
     theme: theme,
@@ -97,7 +97,7 @@ openWall(22, 32);  // west
 openWall(42, 32);  // east
 
 // Chest on the central lake
-placeObject(mapId, { x: 32, y: 32, kind: "chest", name: "coffre-sur-le-lac" });
+placeObject(mapId, { x: 32, y: 32, kind: "chest", name: "lake-chest" });
 
 // Frozen fountain north of the centre, one cell inside so it does not plug the north opening
 paintRect(mapId, "decorations", 32, 24, 32, 24, "obstacle_decor");
@@ -115,7 +115,7 @@ paintRect(mapId, "decorations", 33, 40, 33, 40, "decoration_minor");
 paintRect(mapId, "ground", 15, 2, 48, 16, "walkable_floor");
 paintWallBorder(mapId, 15, 2, 48, 16);
 openWall(31, 16);
-placeSpawn(mapId, { x: 31, y: 6, role: "enemy", npcName: "Seigneur des Glaces", name: "boss-final" });
+placeSpawn(mapId, { x: 31, y: 6, role: "enemy", npcName: "Ice Lord", name: "boss-final" });
 // Boss throne
 paintRect(mapId, "decorations", 31, 4, 31, 4, "obstacle_decor");
 
@@ -129,40 +129,40 @@ placeSpawn(mapId, { x: 31, y: 54, role: "player", name: "player-start" });
 paintLRoom(47, 18, 62, 40, 47, 41, 58, 46, "walkable_floor");
 paintWallBorder(mapId, 47, 18, 62, 46);
 openWall(47, 31);
-placeSpawn(mapId, { x: 54, y: 31, role: "enemy", npcName: "Givre-Rôdeur", name: "ice-creature-east" });
+placeSpawn(mapId, { x: 54, y: 31, role: "enemy", npcName: "Frost Stalker", name: "ice-creature-east" });
 paintRect(mapId, "decorations", 58, 31, 58, 31, "obstacle_decor");
 
 // WEST: L-shaped room
 paintLRoom(2, 18, 17, 40, 6, 41, 17, 46, "walkable_floor");
 paintWallBorder(mapId, 2, 18, 17, 46);
 openWall(17, 31);
-placeSpawn(mapId, { x: 10, y: 31, role: "enemy", npcName: "Givre-Rôdeur", name: "ice-creature-west" });
+placeSpawn(mapId, { x: 10, y: 31, role: "enemy", npcName: "Frost Stalker", name: "ice-creature-west" });
 paintRect(mapId, "decorations", 6, 31, 6, 31, "obstacle_decor");
 
 // NORTH-EAST: circular room (radius 8)
 paintCircleRoom(54, 10, 8, "walkable_floor");
 paintWallBorder(mapId, 46, 2, 62, 18);
 openWall(49, 18);
-placeSpawn(mapId, { x: 54, y: 10, role: "enemy", npcName: "Esprit de Glace", name: "ice-creature-ne" });
-placeObject(mapId, { x: 54, y: 6, kind: "chest", name: "coffre-ne" });
+placeSpawn(mapId, { x: 54, y: 10, role: "enemy", npcName: "Ice Spirit", name: "ice-creature-ne" });
+placeObject(mapId, { x: 54, y: 6, kind: "chest", name: "north-east-chest" });
 
 // NORTH-WEST: circular room (radius 8)
 paintCircleRoom(10, 10, 8, "walkable_floor");
 paintWallBorder(mapId, 2, 2, 18, 18);
 openWall(14, 18);
-placeSpawn(mapId, { x: 10, y: 10, role: "enemy", npcName: "Esprit de Glace", name: "ice-creature-nw" });
+placeSpawn(mapId, { x: 10, y: 10, role: "enemy", npcName: "Ice Spirit", name: "ice-creature-nw" });
 
 // SOUTH-EAST: T-shaped room
 paintTRoom(47, 44, 62, 53, 52, 53, 56, 61, "walkable_floor");
 paintWallBorder(mapId, 47, 44, 62, 61);
 openWall(49, 44);
-placeSpawn(mapId, { x: 54, y: 56, role: "enemy", npcName: "Givre-Rôdeur", name: "ice-creature-se" });
+placeSpawn(mapId, { x: 54, y: 56, role: "enemy", npcName: "Frost Stalker", name: "ice-creature-se" });
 
 // SOUTH-WEST: T-shaped room
 paintTRoom(2, 44, 17, 53, 8, 53, 12, 61, "walkable_floor");
 paintWallBorder(mapId, 2, 44, 17, 61);
 openWall(15, 44);
-placeSpawn(mapId, { x: 10, y: 56, role: "enemy", npcName: "Givre-Rôdeur", name: "ice-creature-sw" });
+placeSpawn(mapId, { x: 10, y: 56, role: "enemy", npcName: "Frost Stalker", name: "ice-creature-sw" });
 
 // ---------- Outer ring (belt corridor linking the rooms) ----------
 paintRect(mapId, "ground", 2, 17, 62, 20, "walkable_floor");   // top
@@ -248,11 +248,11 @@ paintRect(mapId, "ground", 32, 6, 32, 6, "stairs");
 paintRect(mapId, "ground", 32, 57, 32, 57, "stairs");
 
 // ---------- Lever (mechanism) ----------
-placeObject(mapId, { x: 40, y: 32, kind: "lever", name: "levier-pont-levis" });
+placeObject(mapId, { x: 40, y: 32, kind: "lever", name: "drawbridge-lever" });
 
 // ---------- Save the map ----------
 const mapData = serializeMap(mapId);
-const outPath = fileURLToPath(new URL('../maps/forteresse-glace-etage.tmj', import.meta.url));
+const outPath = fileURLToPath(new URL('../maps/ice-fortress.tmj', import.meta.url));
 await saveMapFile(mapId, outPath);
 
 console.log("Saved:", outPath);

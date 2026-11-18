@@ -3,7 +3,7 @@
 // a marker on every object and spawn so you can check where they landed.
 //
 // Usage (from the repository root, after npm install && npm run build):
-//   node scripts/render-map-preview.mjs maps/forteresse-glace-etage.tmj
+//   node scripts/render-map-preview.mjs maps/ice-fortress.tmj
 //   node scripts/render-map-preview.mjs <map.tmj> [out.png] [--width 1600] [--no-markers]
 //
 // The renderer itself lives in tiled-mcp/src/render.ts and is shared with the hosted web page.

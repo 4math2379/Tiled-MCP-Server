@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createMap, describeMap, discardMap, listMaps, maxMapSize } from "../builder.js";
-import { THEME_KEYS, describeThemes, getTheme } from "../themes/index.js";
+import { describeThemes, getTheme, themeKeySchema } from "../themes/index.js";
 import { asText } from "./util.js";
 
 export function registerLifecycleTools(server: McpServer): void {
@@ -28,7 +28,7 @@ export function registerLifecycleTools(server: McpServer): void {
         name: z.string().min(1).max(120).describe("Display name of the map, e.g. 'Crypt under the abandoned chapel'"),
         width: z.number().int().min(4).max(max).describe(`Width in cells, 4..${max} (1 cell = 5 ft in tabletop terms)`),
         height: z.number().int().min(4).max(max).describe(`Height in cells, 4..${max}`),
-        theme: z.enum(THEME_KEYS).describe("Theme key from list_themes, e.g. CRYPT"),
+        theme: themeKeySchema().describe("Theme key from list_themes, e.g. CRYPT"),
         orientation: z.enum(["isometric", "orthogonal"]).optional().describe("Defaults to isometric"),
       },
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },

@@ -1,4 +1,4 @@
-// Example map script: builds maps/caverne-aquatique.tmj (AQUATIC theme, 64x64: flooded cavern with a central lake)
+// Example map script: builds maps/water-cavern.tmj (AQUATIC theme, 64x64: flooded cavern with a central lake)
 // by calling the builder API directly, without an MCP client. It is deterministic:
 // re-running it reproduces the committed sample map. Run from the repository root
 // after building the server (npm run build):
@@ -12,7 +12,7 @@ import fs from 'node:fs';
 const theme = getTheme("AQUATIC");
 
 const { mapId } = createMap({
-    name: "Caverne Aquatique Souterraine",
+    name: "Underground Water Cavern",
     width: 64,
     height: 64,
     theme: theme,
@@ -93,7 +93,7 @@ paintRect(mapId, "decorations", 38, 38, 38, 38, "obstacle_decor");
 paintRect(mapId, "ground", 20, 2, 42, 15, "walkable_floor");
 paintWallBorder(mapId, 20, 2, 42, 15);
 openWall(31, 15);
-placeSpawn(mapId, { x: 31, y: 8, role: "enemy", npcName: "Seigneur des Abysses", name: "boss-final" });
+placeSpawn(mapId, { x: 31, y: 8, role: "enemy", npcName: "Lord of the Depths", name: "boss-final" });
 
 // SOUTH: rectangular room, player entrance
 paintRect(mapId, "ground", 20, 48, 42, 61, "walkable_floor");
@@ -105,39 +105,39 @@ placeSpawn(mapId, { x: 31, y: 55, role: "player", name: "player-start" });
 paintLRoom(46, 20, 62, 41, 46, 42, 58, 50, "walkable_floor");
 paintWallBorder(mapId, 46, 20, 62, 50);
 openWall(46, 31);
-placeSpawn(mapId, { x: 54, y: 31, role: "enemy", npcName: "Rampant des Eaux", name: "water-creature-east" });
+placeSpawn(mapId, { x: 54, y: 31, role: "enemy", npcName: "Water Crawler", name: "water-creature-east" });
 
 // WEST: L-shaped room
 paintLRoom(2, 20, 18, 41, 6, 42, 18, 50, "walkable_floor");
 paintWallBorder(mapId, 2, 20, 18, 50);
 openWall(18, 31);
-placeSpawn(mapId, { x: 10, y: 31, role: "enemy", npcName: "Rampant des Eaux", name: "water-creature-west" });
+placeSpawn(mapId, { x: 10, y: 31, role: "enemy", npcName: "Water Crawler", name: "water-creature-west" });
 
 // NORTH-EAST: circular room (radius 7)
 paintCircleRoom(53, 11, 7, "walkable_floor");
 paintWallBorder(mapId, 46, 4, 60, 18);
 openWall(49, 18);
-placeSpawn(mapId, { x: 53, y: 11, role: "enemy", npcName: "Esprit de l'Onde", name: "water-creature-ne" });
+placeSpawn(mapId, { x: 53, y: 11, role: "enemy", npcName: "Wave Spirit", name: "water-creature-ne" });
 
 // NORTH-WEST: circular room (radius 7)
 paintCircleRoom(11, 11, 7, "walkable_floor");
 paintWallBorder(mapId, 4, 4, 18, 18);
 openWall(14, 18);
-placeSpawn(mapId, { x: 11, y: 11, role: "enemy", npcName: "Esprit de l'Onde", name: "water-creature-nw" });
+placeSpawn(mapId, { x: 11, y: 11, role: "enemy", npcName: "Wave Spirit", name: "water-creature-nw" });
 
 // SOUTH-EAST: T-shaped room
 paintRect(mapId, "ground", 46, 44, 62, 52, "walkable_floor");
 paintRect(mapId, "ground", 52, 52, 56, 60, "walkable_floor");
 paintWallBorder(mapId, 46, 44, 62, 60);
 openWall(49, 44);
-placeSpawn(mapId, { x: 54, y: 55, role: "enemy", npcName: "Rampant des Eaux", name: "water-creature-se" });
+placeSpawn(mapId, { x: 54, y: 55, role: "enemy", npcName: "Water Crawler", name: "water-creature-se" });
 
 // SOUTH-WEST: T-shaped room
 paintRect(mapId, "ground", 2, 44, 18, 52, "walkable_floor");
 paintRect(mapId, "ground", 8, 52, 12, 60, "walkable_floor");
 paintWallBorder(mapId, 2, 44, 18, 60);
 openWall(15, 44);
-placeSpawn(mapId, { x: 10, y: 55, role: "enemy", npcName: "Rampant des Eaux", name: "water-creature-sw" });
+placeSpawn(mapId, { x: 10, y: 55, role: "enemy", npcName: "Water Crawler", name: "water-creature-sw" });
 
 // ---------- Wide corridors ----------
 paintRect(mapId, "ground", 30, 16, 34, 47, "walkable_floor");  // N-S
@@ -202,11 +202,11 @@ for (const [lx, ly] of lilyPads) {
 }
 
 // ---------- Objects: only the chest (interactable) ----------
-placeObject(mapId, { x: 32, y: 32, kind: "chest", name: "sarcophage-submerge" });
+placeObject(mapId, { x: 32, y: 32, kind: "chest", name: "sunken-sarcophagus" });
 
 // ---------- Save the map ----------
 const mapData = serializeMap(mapId);
-const outPath = fileURLToPath(new URL('../maps/caverne-aquatique.tmj', import.meta.url));
+const outPath = fileURLToPath(new URL('../maps/water-cavern.tmj', import.meta.url));
 await saveMapFile(mapId, outPath);
 
 console.log("Saved:", outPath);

@@ -6,7 +6,7 @@ Start with the automated check. It starts the server and exercises it end to end
 npm run build && npm run smoke
 ```
 
-If it prints `73 passed, 0 failed`, the server works and the problem is in the client setup.
+If it prints `96 passed, 0 failed`, the server works and the problem is in the client setup.
 
 ## The tools do not appear in my client
 

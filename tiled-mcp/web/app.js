@@ -10,7 +10,7 @@ const EXAMPLES = [
   ["Crypt", "A crypt 28x18 under an abandoned chapel: two skeletons patrol the nave, a ghoul lord sleeps in the deep crypt behind a locked door (DC 15), and a poison trap guards the reliquary."],
   ["Ice fortress", "A frozen fortress 30x22: a great hall with ice pillars, a throne room at the far end where a frost giant waits, two guard rooms, and slippery ice in the corridors."],
   ["Tavern", "A cozy tavern 20x14 with a bar, tables, a hearth and stairs to the cellar. The innkeeper and three patrons are friendly NPCs; a thief hides in the storeroom."],
-  ["Repaire (FR)", "Un repaire de loups-garous 24x18 dans une grotte humide : l'alpha dort au fond de sa tanière, des tas d'os ralentissent le passage, et trois loups attendent en embuscade près de l'entrée."],
+  ["Werewolf den (in French)", "Un repaire de loups-garous 24x18 dans une grotte humide : l'alpha dort au fond de sa tanière, des tas d'os ralentissent le passage, et trois loups attendent en embuscade près de l'entrée."],
 ];
 
 let session = loadSession();

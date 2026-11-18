@@ -6,9 +6,9 @@ const A = "./assets/castle";
 
 export const CASTLE: Theme = {
   key: "CASTLE",
-  name: "Castel Von Drak",
+  name: "Castle Von Drak",
   description:
-    "Marbres noirs, basalte poli, vitraux brisés, bannières frappées du blason des Von Drak. Salle du trône, escaliers grandioses, candélabres en fer noir.",
+    "Black marble, polished basalt, shattered stained glass, banners bearing the Von Drak crest. Throne room, grand staircases, black iron candelabra.",
   tilesetName: "castle-tileset",
   tilewidth: 64,
   tileheight: 32,
