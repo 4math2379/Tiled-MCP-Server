@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.4.1
+
+Walking reachability: a map can load correctly and still not be explorable. Suggested in
+feedback on the 0.4.0 announcement.
+
+### Added
+
+- `validate_map` and `validate_world` flood-fill the grid from the player spawn, following
+  transitions into linked maps, and warn about objects the player cannot reach on foot, floor
+  areas cut off from the rest, maps whose every way in is cut off, and arrival points walled in
+  with no way out. Walls, obstacle props, unpainted cells and buildings block; a transition must
+  be stepped on, other objects can be used from a side cell. See
+  [docs/map-format.md](docs/map-format.md#walking-reachability).
+- `validate_map` warns about a spawn standing inside an obstacle prop.
+- Smoke tests for a room cut in half by props, a fenced doorway whose links stay valid, and an
+  arrival point with no way out.
+
+### Fixed
+
+- `generate_castle_floor` (throne variant) and castle interiors put the castle lord on the throne
+  prop, where it could never move; it now stands in front of the throne.
+- Example maps: the frozen fountains of `forteresse-glace-etage.tmj` blocked the only doorways of
+  its central hall, and overlapping walls sealed rooms of it and of `caverne-aquatique.tmj`. Both
+  scripts now build maps where every room can be walked to.
+- The hosted-mode smoke test placed its house across a doorway, sealing a crypt chamber.
+
 ## 0.4.0
 
 Large outdoor maps with buildings you can enter. Each building's interior is its own map,

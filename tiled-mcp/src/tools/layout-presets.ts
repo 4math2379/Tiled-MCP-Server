@@ -139,7 +139,8 @@ export function buildCastleFloor(
     const tx = farRoom.originX + Math.floor(farRoom.width / 2);
     const ty = farRoom.originY + 1;
     paintTile(mapId, "decorations", tx, ty, "obstacle_decor");
-    placeSpawn(mapId, { x: tx, y: ty, role: "enemy", npcName: "Castle lord" });
+    // The lord stands in front of the throne: a spawn inside a blocking prop could never move.
+    placeSpawn(mapId, { x: tx, y: ty + 1, role: "enemy", npcName: "Castle lord" });
   }
 
   const inside = { x: antechamber.originX + 1, y: antechamber.originY + 3 };

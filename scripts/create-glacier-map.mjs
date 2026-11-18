@@ -99,15 +99,15 @@ openWall(42, 32);  // east
 // Chest on the central lake
 placeObject(mapId, { x: 32, y: 32, kind: "chest", name: "coffre-sur-le-lac" });
 
-// Frozen fountain north of the centre
-paintRect(mapId, "decorations", 32, 23, 32, 23, "obstacle_decor");
-paintRect(mapId, "decorations", 31, 23, 31, 23, "decoration_minor");
-paintRect(mapId, "decorations", 33, 23, 33, 23, "decoration_minor");
+// Frozen fountain north of the centre, one cell inside so it does not plug the north opening
+paintRect(mapId, "decorations", 32, 24, 32, 24, "obstacle_decor");
+paintRect(mapId, "decorations", 31, 24, 31, 24, "decoration_minor");
+paintRect(mapId, "decorations", 33, 24, 33, 24, "decoration_minor");
 
-// Frozen fountain south of the centre
-paintRect(mapId, "decorations", 32, 41, 32, 41, "obstacle_decor");
-paintRect(mapId, "decorations", 31, 41, 31, 41, "decoration_minor");
-paintRect(mapId, "decorations", 33, 41, 33, 41, "decoration_minor");
+// Frozen fountain south of the centre, likewise clear of the south opening
+paintRect(mapId, "decorations", 32, 40, 32, 40, "obstacle_decor");
+paintRect(mapId, "decorations", 31, 40, 31, 40, "decoration_minor");
+paintRect(mapId, "decorations", 33, 40, 33, 40, "decoration_minor");
 
 // ---------- Outer rooms (various shapes) ----------
 
@@ -175,6 +175,15 @@ openWall(31, 17);   // toward north
 openWall(31, 46);   // toward south
 openWall(5, 31);    // toward west
 openWall(58, 31);   // toward east
+
+// The side halls' bottom walls cut the two southern T rooms in half: open them.
+openWall(10, 46);   // south-west room
+openWall(54, 46);   // south-east room
+
+// Overlapping room borders leave thin strips of floor sealed between two walls: wall them in.
+paintRect(mapId, "walls", 16, 3, 17, 15, "wall");
+paintRect(mapId, "walls", 47, 3, 47, 15, "wall");
+paintRect(mapId, "walls", 16, 48, 16, 60, "wall");
 
 // ---------- Wide corridors toward the centre ----------
 paintRect(mapId, "ground", 29, 17, 35, 22, "walkable_floor");  // N-S toward centre

@@ -62,7 +62,7 @@ place_building(mapId, buildingType="castle", x=70, y=20, door="south")
 link_maps(fromMapId=<castle interior>, fromX=12, fromY=8,
           toMapId=<a cellar map>, toX=5, toY=4, kind="stairs")                  # optional
 place_spawn_player(mapId, x=10, y=48)
-validate_world(mapId)          # every link leads somewhere real, every map can be entered
+validate_world(mapId)          # every link leads somewhere real, every map can be walked
 save_world(mapId, folder="crossroads")                                          # all maps, side by side
 ```
 

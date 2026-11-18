@@ -151,6 +151,19 @@ paintRect(mapId, "ground", 2, 58, 62, 60, "walkable_floor");   // bottom
 paintRect(mapId, "ground", 2, 3, 4, 60, "walkable_floor");     // left
 paintRect(mapId, "ground", 60, 3, 62, 60, "walkable_floor");   // right
 
+// Passages that make every room reachable on foot (validate_map's walking check):
+// the north circle rooms open onto a ledge that joins their corridor and the outer ring,
+paintRect(mapId, "ground", 14, 18, 14, 18, "walkable_floor");
+paintRect(mapId, "ground", 5, 19, 17, 19, "walkable_floor");
+paintRect(mapId, "ground", 49, 17, 49, 18, "walkable_floor"); // its door faced an unpainted corner
+paintRect(mapId, "ground", 47, 19, 59, 19, "walkable_floor");
+// the side halls' bottom walls no longer seal the south T rooms in half,
+openWall(10, 50);
+openWall(54, 50);
+// and the scraps of the bottom ring left between two walls are walled in.
+paintRect(mapId, "walls", 19, 58, 19, 60, "wall");
+paintRect(mapId, "walls", 43, 58, 45, 60, "wall");
+
 // ---------- Hazards ----------
 // Ring of deep water around the central lake (radius 4 to 6)
 for (let y = 26; y <= 38; y++) {

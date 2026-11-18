@@ -40,7 +40,7 @@
 - 🏘️ **Buildings you can enter**: put houses, taverns, temples, towers or castles on an outdoor map; each gets its own interior map, linked both ways, ready to load in a game ([guide with a Godot loader](docs/worlds-and-buildings.md)).
 - 🏰 **3 layout presets**: a crypt, a castle floor and a werewolf den, each built in one call.
 - 🎨 **20 themes**, 12 of them with bundled isometric sprites ready to use.
-- 🛡️ **Guard rails for agents**: placing a chest on a wall, outside a room or on another object fails with a message that says how to fix it, and `validate_map` checks the map before export.
+- 🛡️ **Guard rails for agents**: placing a chest on a wall, outside a room or on another object fails with a message that says how to fix it, and `validate_map` checks the map before export, including that the player can walk to every room, chest and doorway.
 - 📐 **Correct Tiled output**: object positions follow Tiled's isometric convention, and saved files point at their sprites with relative paths, so they open directly in Tiled.
 - 🧠 **Agent skill and MCP prompt** (`map_builder`): a step-by-step workflow with an ASCII sketch confirmation, theme heuristics and tactical rules.
 - 🖌️ **Optional sprite generation** with FLUX.1-dev through Hugging Face. It is paid, opt-in, and never runs by accident.

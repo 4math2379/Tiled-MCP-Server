@@ -13,7 +13,7 @@ import { registerWorldTools } from "./tools/world.js";
 import { registerPrompts } from "./prompts.js";
 
 export const SERVER_NAME = "tiled-map-builder";
-export const SERVER_VERSION = "0.4.0";
+export const SERVER_VERSION = "0.4.1";
 
 export function createServer(): McpServer {
   const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });

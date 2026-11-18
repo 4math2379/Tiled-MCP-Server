@@ -168,6 +168,8 @@ Placement rules the server enforces (a failing call explains why):
 - Doors go in wall openings. `generate_room` exits do this for you; for a custom doorway, call
   `erase_tile(layer="walls")` first.
 - Corridors are straight; chain two corridors for an L shape.
+- Keep paths open: a prop, a wall or a building right behind a doorway seals the room beyond.
+  `validate_map` walks the map from the player spawn and names what cannot be reached on foot.
 
 #### Outdoor maps with buildings you can enter
 
@@ -183,7 +185,8 @@ with houses, a tavern, a temple, a tower or a castle the player should walk into
 4. Optional: edit an interior with the usual tools (its mapId is in the result), and join
    extra levels with link_maps(kind="stairs"), e.g. a castle cellar or a tower top.
 5. place_spawn_player on the outdoor map only; interiors start on their arrival points.
-6. validate_map on each map, then validate_world(mapId): fix every error.
+6. validate_map on each map, then validate_world(mapId): fix every error, and every warning
+   about places that cannot be reached on foot (a building or prop blocking a path).
 7. save_world(mapId): writes every linked map side by side (the links use those file names).
 ```
 

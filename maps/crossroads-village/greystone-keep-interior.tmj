@@ -503,7 +503,7 @@
         {
           "id": 9,
           "x": 720,
-          "y": 272,
+          "y": 304,
           "point": true,
           "name": "enemy-9",
           "type": "enemy",

@@ -6,7 +6,7 @@ Start with the automated check. It starts the server and exercises it end to end
 npm run build && npm run smoke
 ```
 
-If it prints `39 passed, 0 failed`, the server works and the problem is in the client setup.
+If it prints `73 passed, 0 failed`, the server works and the problem is in the client setup.
 
 ## The tools do not appear in my client
 
@@ -49,6 +49,16 @@ Create a larger map, or build the layout with `generate_room` and `generate_corr
 The error says why: a wall on that cell, no ground (outside the rooms), an obstacle prop, or
 another object or spawn already there. Use `get_tile_info` on the `walls` and `ground` layers
 and pick a free floor cell. Doors are the exception: they go in wall openings.
+
+## "cannot be reached on foot"
+
+`validate_map` or `validate_world` found part of the map the player cannot walk to from the
+player spawn (see [Walking reachability](map-format.md#walking-reachability)). The usual causes:
+an obstacle prop or a building right behind a doorway, a wall opening with no ground painted in
+it, or two rooms whose walls overlap and leave no opening between them. The warning names the
+objects and gives one cell of each cut-off area: open a path there with `erase_tile`
+(`layer=decorations` for a prop, `layer=walls` for a wall) or `paint_rect` on the ground, or move
+the building.
 
 ## Sprite generation fails
 

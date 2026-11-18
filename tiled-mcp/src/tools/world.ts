@@ -110,7 +110,7 @@ export function registerWorldTools(server: McpServer): void {
     {
       title: "Validate linked maps",
       description:
-        "Checks the maps linked to mapId (or every map of the session): each transition leads to a map of this session and to an arrival spawn that exists there (errors), every link has a way back, every map can be entered, some map has a player spawn, and building sprites exist (warnings). Also lists the maps with their file names and every link. Run validate_map on each map too.",
+        "Checks the maps linked to mapId (or every map of the session): each transition leads to a map of this session and to an arrival spawn that exists there (errors), every link has a way back, every map can be entered, some map has a player spawn, building sprites exist, and the whole world can be walked: starting from the player spawn and following each transition the player can reach on foot, every object and floor area of every map is reachable and no arrival point is walled in (warnings, prefixed with the map's file name). Also lists the maps with their file names and every link. Run validate_map on each map too.",
       inputSchema: { mapId: z.string().optional().describe("Any map of the world; omit to check every map of the session") },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },

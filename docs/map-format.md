@@ -204,10 +204,31 @@ legacy positions on the right tiles, so prefer migrating the importer to the for
 
 - **errors**: structural problems (missing fields, invalid size or orientation).
 - **warnings**: no player spawn (or arrival point), an object or spawn on a wall or outside
-  the painted ground, a door still inside a wall.
+  the painted ground, a spawn inside an obstacle prop, a door still inside a wall, and anything
+  the player cannot walk to (below).
 
 `validate_world` checks the links between maps: every transition leads to a map of the session
 and to an arrival spawn that exists there (errors), every link has a way back, every map can be
-entered, and building sprites exist (warnings).
+entered, building sprites exist, and the whole world can be walked (warnings).
+
+### Walking reachability
+
+Both tools flood-fill the grid from where the player starts, so a map that loads correctly but
+cannot be explored is reported. The rules:
+
+- A cell is walkable when its ground is painted and it holds no wall, no obstacle prop
+  (`OBSTACLE` tile on the decorations layer) and no building footprint. A building's entrance
+  cell stays walkable. Hazards and difficult terrain are walkable; objects and spawns do not block.
+- Moves go to the four side neighbours, never diagonally, so a gap between two corners is closed.
+- A transition (an object with `targetMap`) must be stepped on and cannot be crossed: stepping
+  on it loads the other map, where the walk carries on from its `targetSpawn`. Chests, levers,
+  enemies and other objects count as reached when the player can stand on them or next to them.
+- The walk starts on the player spawns of the world, or on every arrival point when no map has a
+  player spawn yet.
+
+It warns about objects the player cannot reach, floor areas cut off from the rest, maps whose
+every way in is cut off, and arrival points walled in with no way out. `validate_map` reports
+the map it is given, following its links; `validate_world` reports every map, each warning
+prefixed with the map's file name.
 
 Your engine should still validate the map on import.

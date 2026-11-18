@@ -8,7 +8,7 @@ npm run preview -- maps/forteresse-glace-etage.tmj
 
 | File | Theme | Size | How it was made |
 |---|---|---|---|
-| `exemple-crypte-nemotron.tmj` | `CRYPT` | 20x14 | Built by a Nemotron agent through the MCP tools with an early version of the server. The crypt preset ran on a map smaller than it needs, so some rooms overlap and two doors share a cell; current versions refuse that size (the crypt preset needs 27x18). Kept as a real agent-made example. |
+| `exemple-crypte-nemotron.tmj` | `CRYPT` | 20x14 | Built by a Nemotron agent through the MCP tools with an early version of the server. The crypt preset ran on a map smaller than it needs, so some rooms overlap and two doors share a cell; current versions refuse that size (the crypt preset needs 27x18). A prop behind the north door also seals the north room, which `validate_map`'s walking check now reports. Kept as a real agent-made example. |
 | `caverne-aquatique.tmj` | `AQUATIC` | 64x64 | `scripts/create-aquatic-map.mjs` |
 | `forteresse-glace-etage.tmj` | `GLACIAIRE` | 64x64 | `scripts/create-glacier-map.mjs` |
 | `reseau-electronique-repaire-hacker.tmj` | `ELECTRONIQUE` | 64x64 | `scripts/create-electronic-hacker-map.mjs` |
@@ -20,7 +20,8 @@ the castle reached by stairs. Open `crossroads-village/crossroads-village.tmj`; 
 an entrance on the `objects` layer and right-click its `targetMap` property to open the interior.
 How the links work, and a Godot loader: [docs/worlds-and-buildings.md](../docs/worlds-and-buildings.md).
 
-The scripted maps and the world are deterministic: `npm run examples` rebuilds them identically.
+The scripted maps and the world are deterministic: `npm run examples` rebuilds them identically,
+and every room of them can be walked to from the player spawn.
 
 This folder is also the default output of `save_to_disk` for relative paths (change it with
 `TILED_MAPS_DIR`). Sprite paths in these files point to `../assets/`, so keep the maps inside the

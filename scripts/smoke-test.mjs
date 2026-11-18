@@ -184,6 +184,7 @@ const world = (await call("validate_world", { mapId: out.mapId })).data;
 check("world validates: 4 linked maps, no errors", world.ok && world.maps.length === 4 && world.errors.length === 0, world);
 check("world has no one-way links", !world.warnings.some((w) => /no way back/.test(w)), world.warnings);
 check("world start map is the outdoor map", world.startMaps.length === 1 && world.startMaps[0] === "smoke-village.tmj", world.startMaps);
+check("whole world can be walked: no reachability warning", !world.warnings.some((w) => /on foot|way out|cannot be reached/.test(w)), world.warnings);
 
 const savedWorld = (await call("save_world", { mapId: out.mapId, folder: "world" })).data;
 check("save_world writes the 4 maps side by side", savedWorld.ok && savedWorld.files.length === 4, savedWorld);
@@ -220,6 +221,45 @@ check(`256x256 preview renders at 1600 px wide (${ms} ms)`, width === 1600 && ms
 await call("discard_map", { mapId: house.interior.mapId });
 const broken = (await call("validate_world", { mapId: out.mapId })).data;
 check("a discarded interior is reported as a broken link", !broken.ok && broken.errors.some((e) => /miller-house-entrance/.test(e)), broken.errors);
+
+// Walking reachability (flood fill from where the player starts or arrives)
+const hall = (await call("create_map", { name: "Split hall", width: 14, height: 10, theme: "CRYPT" })).data;
+await call("generate_room", { mapId: hall.mapId, originX: 0, originY: 0, width: 14, height: 10 });
+await call("place_spawn_player", { mapId: hall.mapId, x: 2, y: 5 });
+await call("place_chest", { mapId: hall.mapId, x: 11, y: 5, name: "far-chest" });
+for (let y = 1; y <= 8; y++) await call("paint_tile", { mapId: hall.mapId, layer: "decorations", x: 7, y, role: "obstacle_decor" });
+const split = (await call("validate_map", { mapId: hall.mapId })).data;
+check("a row of props cutting a room hides the chest behind it", split.warnings.some((w) => /cannot be reached on foot/.test(w) && w.includes('"far-chest"')), split.warnings);
+check("the cut-off half of the room is reported as unreachable floor", split.warnings.some((w) => /floor cells in 1 area cannot be reached/.test(w)), split.warnings);
+await call("erase_tile", { mapId: hall.mapId, layer: "decorations", x: 7, y: 5 });
+const opened = (await call("validate_map", { mapId: hall.mapId })).data;
+check("one gap in the row of props clears every warning", opened.warnings.length === 0, opened.warnings);
+
+const yard = (await call("create_map", { name: "Fenced yard", width: 20, height: 20, theme: "VILLAGE" })).data;
+await call("paint_rect", { mapId: yard.mapId, layer: "ground", x1: 0, y1: 0, x2: 19, y2: 19, role: "walkable_floor" });
+await call("place_spawn_player", { mapId: yard.mapId, x: 2, y: 2 });
+const hut = (await call("place_building", { mapId: yard.mapId, buildingType: "house", x: 10, y: 10, name: "Hut" })).data;
+const clean = (await call("validate_world", { mapId: yard.mapId })).data;
+check("a building on open ground can be walked to and back", clean.ok && !clean.warnings.some((w) => /on foot|way out|cannot be reached/.test(w)), clean.warnings);
+// Fence the doorway: entrance and arrival point stay valid links, but the player cannot walk there.
+const front = hut.outsideArrival;
+for (const [x, y] of [[front.x - 1, front.y], [front.x + 1, front.y], [front.x, front.y + 1]]) {
+  await call("paint_tile", { mapId: yard.mapId, layer: "decorations", x, y, role: "obstacle_decor" });
+}
+const fenced = (await call("validate_world", { mapId: yard.mapId })).data;
+check("fenced doorway: links still valid (no errors)", fenced.ok && fenced.errors.length === 0, fenced.errors);
+check("fenced doorway: entrance reported unreachable from the start", fenced.warnings.some((w) => w.startsWith("fenced-yard.tmj:") && w.includes('"hut-entrance"')), fenced.warnings);
+check("fenced doorway: the interior is reported as cut off", fenced.warnings.some((w) => w.startsWith("hut-interior.tmj:") && /nothing on this map can be reached/.test(w)), fenced.warnings);
+const fencedMap = (await call("validate_map", { mapId: yard.mapId })).data;
+check("validate_map reports the fenced doorway too", fencedMap.warnings.some((w) => w.includes('"hut-entrance"')), fencedMap.warnings);
+await call("erase_tile", { mapId: yard.mapId, layer: "decorations", x: front.x, y: front.y + 1 });
+const unfenced = (await call("validate_world", { mapId: yard.mapId })).data;
+check("opening the fence clears the walking warnings", !unfenced.warnings.some((w) => /on foot|way out|cannot be reached/.test(w)), unfenced.warnings);
+// Block the interior exit: the arrival point inside can no longer walk out.
+const exitCell = (await call("validate_world", { mapId: yard.mapId })).data.links.find((l) => l.from === "hut-interior.tmj").cell;
+await call("paint_tile", { mapId: hut.interior.mapId, layer: "decorations", x: exitCell.x, y: exitCell.y, role: "obstacle_decor" });
+const trapped = (await call("validate_map", { mapId: hut.interior.mapId })).data;
+check("an arrival point with no reachable way out is reported", trapped.warnings.some((w) => /cannot walk to any way out/.test(w) && w.includes("hut-inside")), trapped.warnings);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (stderr.trim()) console.log("SERVER STDERR:", stderr.slice(0, 500));

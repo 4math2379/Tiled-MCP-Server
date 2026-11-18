@@ -5,6 +5,8 @@ import { getMap, objectCoordMode, serializeMap } from "../builder.js";
 import { isHosted } from "../context.js";
 import { publishMap } from "../downloads.js";
 import { mapsRoot, resolveUserPath } from "../paths.js";
+import { reachabilityWarnings, walkWorld } from "../reachability.js";
+import { worldOf } from "../world.js";
 import { saveMapFile, stringifyMap } from "../tmj.js";
 import { asText } from "./util.js";
 
@@ -31,7 +33,7 @@ export function registerExportTools(server: McpServer): void {
     {
       title: "Validate a map",
       description:
-        "Checks the map before export: Tiled structure (errors) and gameplay sanity (warnings): at least one player spawn, no object or spawn on a wall or outside the painted ground, no door left inside a wall. Returns { ok, errors, warnings }.",
+        "Checks the map before export: Tiled structure (errors) and gameplay sanity (warnings): at least one player spawn, no object or spawn on a wall or outside the painted ground, no spawn inside an obstacle prop, no door left inside a wall, and walking reachability: every object and floor area can be reached on foot from where the player starts or arrives (walls, obstacle props, unpainted cells and buildings block; objects and spawns do not; no diagonal moves; a map transition must be stepped on, anything else can be used from a side cell), following map links like validate_world. Returns { ok, errors, warnings }.",
       inputSchema: { mapId: z.string() },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
@@ -57,9 +59,17 @@ export function registerExportTools(server: McpServer): void {
           if (onWall) warnings.push(`Door "${who.name}" at (${x}, ${y}) is still inside a wall: erase the wall tile (erase_tile layer=walls).`);
           continue;
         }
+        const deco = state.decorations.data[i];
+        const onObstacle = !!deco && state.theme.tiles[deco - state.tileset.firstgid]?.tileType === "OBSTACLE";
         if (onWall) warnings.push(`"${who.name}" (${who.type}) at (${x}, ${y}) stands on a wall.`);
         else if (!onGround) warnings.push(`"${who.name}" (${who.type}) at (${x}, ${y}) stands outside the painted ground.`);
+        // A chest or lever on a prop is used from the next cell; a spawn inside one could never move.
+        else if (onObstacle && who.type.endsWith(" spawn")) warnings.push(`"${who.name}" (${who.type}) at (${x}, ${y}) stands inside an obstacle prop and could never move: erase the prop (erase_tile layer=decorations) or move the spawn.`);
       }
+
+      // Walking reachability, following links into the rest of the map's world.
+      const walk = walkWorld(worldOf(mapId)).get(state.id);
+      if (walk) warnings.push(...reachabilityWarnings(walk));
 
       return asText({ ok: errors.length === 0, errors, warnings, objectCoordinates: objectCoordMode() });
     },

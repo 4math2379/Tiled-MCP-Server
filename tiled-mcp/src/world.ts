@@ -19,7 +19,6 @@ import {
   isTransition,
   mapRef,
   mapRefTarget,
-  objectCoordMode,
   objectNameTaken,
   paintTile,
   placeObject,
@@ -28,6 +27,7 @@ import {
   type MapId,
 } from "./builder.js";
 import { slugify, uniqueName } from "./names.js";
+import { objectCell, reachabilityWarnings, walkWorld } from "./reachability.js";
 import { spriteExists } from "./sprites.js";
 import { getTheme } from "./themes/index.js";
 import { buildCastleFloor } from "./tools/layout-presets.js";
@@ -411,20 +411,6 @@ export function worldOf(mapId: MapId): BuilderState[] {
   return all.filter((s) => seen.has(s.id)).sort((x, y) => (x.id === start.id ? -1 : y.id === start.id ? 1 : x.createdAt - y.createdAt));
 }
 
-/** Grid cell of an object written by this server, from its stored position. */
-function objectCell(state: BuilderState, o: TiledObject): Cell {
-  const tw = state.tilewidth;
-  const th = state.tileheight;
-  if (state.orientation === "orthogonal") return { x: Math.floor(o.x / tw), y: Math.floor(o.y / th) };
-  if (objectCoordMode() === "screen") {
-    return {
-      x: Math.floor((o.x / (tw / 2) + o.y / (th / 2)) / 2),
-      y: Math.floor((o.y / (th / 2) - o.x / (tw / 2)) / 2),
-    };
-  }
-  return { x: Math.floor(o.x / th), y: Math.floor(o.y / th) };
-}
-
 const hasRole = (state: BuilderState, role: string) =>
   state.spawns.objects.some((o) => prop(o, "role") === role);
 
@@ -474,6 +460,14 @@ export function validateWorld(mapId?: MapId) {
       }
     }
   }
+  // Walking: each world is walked on its own, from its player spawns, following transitions.
+  const walked = new Map<MapId, ReturnType<typeof walkWorld> extends Map<MapId, infer W> ? W : never>();
+  for (const s of members) {
+    if (walked.has(s.id)) continue;
+    for (const [id, walk] of walkWorld(worldOf(s.id))) walked.set(id, walk);
+  }
+  for (const s of members) warnings.push(...reachabilityWarnings(walked.get(s.id)!, `${s.fileName}: `));
+
   const startMaps = members.filter((s) => hasRole(s, "player")).map((s) => s.fileName);
   if (members.length && !startMaps.length) {
     warnings.push("No map of this world has a player spawn: add one where the game starts (place_spawn_player).");

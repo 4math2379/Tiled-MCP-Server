@@ -50,8 +50,9 @@ const fakeModel = createServer(async (req, res) => {
     () => call("generate_crypt_layout", { mapId }),
     () => call("save_to_disk", { mapId, path: "../../escape.tmj" }),
     () => call("place_spawn_enemy", { mapId, x: 22, y: 9, npcName: "Ghoul lord" }),
-    // A building inside the nave: its interior becomes a second, linked map.
-    () => call("place_building", { mapId, buildingType: "house", x: 11, y: 7, name: "Shrine" }),
+    // A building inside the nave: its interior becomes a second, linked map. At (12, 8) it leaves
+    // a walkway on every side; at (11, 7) it would seal the north door and its chamber.
+    () => call("place_building", { mapId, buildingType: "house", x: 12, y: 8, name: "Shrine" }),
     () => call("validate_map", { mapId }),
     () => call("validate_world", { mapId }),
   ];

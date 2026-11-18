@@ -346,7 +346,7 @@ Adds a non-hostile NPC spawn point (merchant, quest giver, ally) to the 'spawns'
 
 `read-only`
 
-Checks the map before export: Tiled structure (errors) and gameplay sanity (warnings): at least one player spawn, no object or spawn on a wall or outside the painted ground, no door left inside a wall. Returns { ok, errors, warnings }.
+Checks the map before export: Tiled structure (errors) and gameplay sanity (warnings): at least one player spawn, no object or spawn on a wall or outside the painted ground, no spawn inside an obstacle prop, no door left inside a wall, and walking reachability: every object and floor area can be reached on foot from where the player starts or arrives (walls, obstacle props, unpainted cells and buildings block; objects and spawns do not; no diagonal moves; a map transition must be stepped on, anything else can be used from a side cell), following map links like validate_world. Returns { ok, errors, warnings }.
 
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
@@ -498,7 +498,7 @@ Joins two maps both ways with a door or stairs object on each side, for example 
 
 `read-only`
 
-Checks the maps linked to mapId (or every map of the session): each transition leads to a map of this session and to an arrival spawn that exists there (errors), every link has a way back, every map can be entered, some map has a player spawn, and building sprites exist (warnings). Also lists the maps with their file names and every link. Run validate_map on each map too.
+Checks the maps linked to mapId (or every map of the session): each transition leads to a map of this session and to an arrival spawn that exists there (errors), every link has a way back, every map can be entered, some map has a player spawn, building sprites exist, and the whole world can be walked: starting from the player spawn and following each transition the player can reach on foot, every object and floor area of every map is reachable and no arrival point is walled in (warnings, prefixed with the map's file name). Also lists the maps with their file names and every link. Run validate_map on each map too.
 
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
